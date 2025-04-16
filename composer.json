@@ -1,0 +1,20 @@
+{
+    "name": "amin/shop-spark",
+    "description": "Modular WooCommerce enhancement plugin.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "autoload": {
+      "psr-4": {
+        "ShopSpark\\": "includes/"
+      }
+    },
+    "authors": [
+      {
+        "name": "Al Amin",
+        "email": "hmalaminmb4@gmail.com"
+      }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+  }
+  
