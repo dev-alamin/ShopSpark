@@ -33,6 +33,11 @@ define( 'SHOP_SPARK_VERSION', '1.0.0' );
 define( 'SHOP_SPARK_PLUGIN', __FILE__ );
 define( 'SHOP_SPARK_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'SHOP_SPARK_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+define( 'SHOP_SPARK_PLUGIN_ADMIN_PATH', SHOP_SPARK_PLUGIN_PATH . 'includes/Admin/' );
+define( 'SHOP_SPARK_PLUGIN_INLUCDES_PATH', SHOP_SPARK_PLUGIN_PATH . 'includes/' );
+define( 'SHOP_SPARK_PLUGIN_TEMPLATE_PATH', SHOP_SPARK_PLUGIN_PATH . 'Templates/' );
+define( 'SHOP_SPARK_PLUGIN_ADMIN_TEMPLATE_PATH', SHOP_SPARK_PLUGIN_PATH . 'Templates/Admin/' );
+define( 'SHOP_SPARK_PLUGIN_FRONTEND_TEMPLATE_PATH', SHOP_SPARK_PLUGIN_PATH . 'Templates/Frontend/' );
 
 require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
 
