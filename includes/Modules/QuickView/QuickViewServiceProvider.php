@@ -29,8 +29,8 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
         add_action('wp_ajax_shopspark_quick_view', [ $this, 'shopspark_handle_quick_view' ]);
         add_action('wp_ajax_nopriv_shopspark_quick_view', [ $this, 'shopspark_handle_quick_view' ]);
 
-        // add_action('wp_ajax_shopspark_add_to_cart', [$this, 'shopspark_ajax_add_to_cart' ] );
-        // add_action('wp_ajax_nopriv_shopspark_add_to_cart', [$this, 'shopspark_ajax_add_to_cart' ] );
+        add_action('wp_ajax_shopspark_add_to_cart', [$this, 'shopspark_ajax_add_to_cart' ] );
+        add_action('wp_ajax_nopriv_shopspark_add_to_cart', [$this, 'shopspark_ajax_add_to_cart' ] );
     }
 
     public function enqueue_scripts(): void {
@@ -56,7 +56,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
         wp_localize_script('shopspark-quickview', 'shopspark_ajax', [
             'ajax_url' => admin_url('admin-ajax.php')
-        ]);        
+        ]);
 
         // Tailwind CDN
         wp_enqueue_style('shopspark-tailwind', '//cdn.jsdelivr.net/npm/@tailwindcss/browser@4', [], '3.4.1');
@@ -116,6 +116,8 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
     public function render_quick_view_modal(): void {
         ?>
         <div id="shopspark-quick-view-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+
+        <div id="shopspark-toast-container" class="fixed top-5 right-5 space-y-3 z-50"></div>
 
             <div class="bg-white w-full max-w-3xl rounded-2xl p-6 shadow-xl relative">
                 <button class="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl font-bold"
@@ -228,8 +230,8 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
         } else {
             // For simple products
             ?>
-            <form method="post" class="simple_add_to_cart_form">
-                <input type="hidden" name="add-to-cart" value="<?php echo esc_attr($product->get_id()); ?>">
+            <form class="shopspark_simple_add_to_cart_form">
+                <input type="hidden" name="product_id" value="<?php echo esc_attr($product->get_id()); ?>">
 
                 <div class="quantity mb-4">
                     <label for="quantity_<?php echo esc_attr($product->get_id()); ?>" class="block font-medium mb-1">
@@ -249,7 +251,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
                 </div>
 
                 <button type="submit"
-                    class="add-to-cart-btn mt-4 inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                    class="add-to-cart-btn mt-4 inline-block px-4 py-2 bg-inherit text-white rounded hover:bg-primary-dark transition flex items-center justify-center gap-2">
                     <?php esc_html_e('Add to Cart', 'shopspark'); ?>
                 </button>
             </form>
@@ -319,7 +321,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
         ?>
         <div class="product-variations mt-6">
             <h3 class="text-lg font-semibold mb-2"><?php esc_html_e( 'Select Variation', 'shopspark' ); ?></h3>
-            <form class="variations_form cart" method="post" enctype="multipart/form-data"
+            <form class="shopspark_variations_form cart" method="post" enctype="multipart/form-data"
             data-product_id="<?php echo esc_attr($product_id); ?>"
             data-product_variations="<?php echo esc_attr(json_encode($available_variations, JSON_HEX_TAG)); ?>">
 
@@ -342,7 +344,6 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
                     </div>
                 <?php endforeach; ?>
 
-                <input type="hidden" name="add-to-cart" value="<?php echo esc_attr($product_id); ?>">
                 <input type="hidden" name="product_id" value="<?php echo esc_attr($product_id); ?>">
                 <input type="hidden" name="variation_id" class="variation_id" value="">
 
@@ -505,16 +506,15 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
     }
 
     public function shopspark_ajax_add_to_cart() {
-        // Validate input
-        $product_id = intval($_POST['product_id'] ?? 0);
+        $product_id   = intval($_POST['product_id'] ?? 0);
         $variation_id = intval($_POST['variation_id'] ?? 0);
-        $quantity = intval($_POST['quantity'] ?? 1);
+        $quantity     = intval($_POST['quantity'] ?? 1);
     
         $attributes = array_filter($_POST, function($key) {
             return strpos($key, 'attribute_') === 0;
         }, ARRAY_FILTER_USE_KEY);
     
-        if (!$product_id || !$variation_id) {
+        if (!$product_id) {
             wp_send_json_error(['message' => __('Invalid product.', 'shopspark')]);
         }
     
@@ -524,17 +524,38 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
             wp_send_json_error(['message' => __('Failed validation.', 'shopspark')]);
         }
     
-        // // Attempt to add to cart
+        if (wc_get_product($product_id)->is_type('variable')) {
+            if (!$variation_id) {
+                wp_send_json_error(['message' => __('No variation selected.', 'shopspark')]);
+            }
+        }
+    
         $added = WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $attributes);
     
         if ($added) {
-            // Optional: trigger WooCommerce notice hooks here if needed
-            wp_send_json_success(['message' => __('Added to cart!', 'shopspark')]);
+                   // Get product name
+        $product = wc_get_product($product_id);
+        $message = sprintf(
+            __( '%1$s x %2$s added to cart!', 'shopspark' ),
+            $quantity,
+            $product->get_name()
+        );
+
+        $total_in_cart_message = __( 'Total items in cart', 'shopspark' );
+
+            // Show success message
+            wp_send_json_success([
+                'message' => $message,
+                'tot_message' => $total_in_cart_message,
+                'cart_count' => WC()->cart->get_cart_contents_count(),
+                'cart_url' => wc_get_cart_url()
+            ]);
         } else {
             wp_send_json_error(['message' => __('Could not add to cart.', 'shopspark')]);
         }
-
+    
         wp_die();
     }
+    
     
 }

@@ -105,10 +105,56 @@ function initQuickViewGallery() {
    * and updates the variation ID accordingly.
    */
   function initVariationForm() {
-    // Listen to change events on variation selects
+    document.body.addEventListener('submit', function(e) {
+        const form = e.target;
+
+        if (
+            form.classList.contains('shopspark_variations_form') || 
+            form.classList.contains('shopspark_simple_add_to_cart_form')
+        ) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            let formData = new FormData(form);
+
+            fetch(shopspark_ajax.ajax_url, {
+                method: 'POST',
+                body: new URLSearchParams({
+                    action: 'shopspark_add_to_cart',
+                    ...Object.fromEntries(formData)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Find the button inside the submitted form
+                    const addToCartButton = form.querySelector('.add-to-cart-btn');
+                    if (addToCartButton) {
+                        addToCartButton.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span><?php esc_html_e('Added', 'shopspark'); ?></span>
+                        `;
+                    }
+
+                    showShopSparkToast(data.data.message, 'success');
+                    showShopSparkToast(data.data.tot_message + ' ' +data.data.cart_count, 'success', true);
+                    jQuery('body').trigger('wc_fragment_refresh');
+                } else {
+                    showShopSparkToast(data.data.message || 'Failed to add to cart.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    });
+
+    // Variations change listener (unchanged)
     document.body.addEventListener('change', function(e) {
-        if (e.target.closest('.variations_form')) {
-            const form           = e.target.closest('.variations_form');
+        if (e.target.closest('.shopspark_variations_form')) {
+            const form           = e.target.closest('.shopspark_variations_form');
             const data           = new FormData(form);
             const variationsJSON = form.dataset.product_variations;
             const variations     = JSON.parse(variationsJSON);
@@ -126,6 +172,56 @@ function initQuickViewGallery() {
                 form.querySelector('.variation_id').value = '';
             }
         }
-    });
-  }
-  
+    });    
+}
+
+function showShopSparkToast(message, type = 'success', isCartCountMessage = false) {
+    const container = document.getElementById('shopspark-toast-container');
+
+    if (!container) return;
+
+    // Create the toast element
+    const toast = document.createElement('div');
+    toast.className = `
+        toast-message flex items-center max-w-xs w-full p-4 text-gray-900 bg-white rounded-lg shadow-lg
+        ${type === 'success' ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500'}
+        animate-fade-in-up
+        ${isCartCountMessage ? 'cart-count-toast' : 'add-to-cart-toast'}
+    `;
+    toast.innerHTML = `
+        <div class="text-sm font-medium">${message}</div>
+    `;
+
+    // === NEW FIX: Always remove previous same type toast ===
+    if (isCartCountMessage) {
+        const existingCartToast = container.querySelector('.cart-count-toast');
+        if (existingCartToast) {
+            existingCartToast.remove();
+        }
+    } else {
+        const existingAddToCartToast = container.querySelector('.add-to-cart-toast');
+        if (existingAddToCartToast) {
+            existingAddToCartToast.remove();
+        }
+    }
+
+    // === Add in correct order ===
+    if (isCartCountMessage) {
+        const existingAddToCartToast = container.querySelector('.add-to-cart-toast');
+        if (existingAddToCartToast) {
+            container.insertBefore(toast, existingAddToCartToast.nextSibling);
+        } else {
+            container.appendChild(toast);
+        }
+    } else {
+        container.appendChild(toast);
+    }
+
+    // === Auto remove after 3s ===
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'transition', 'duration-500');
+        setTimeout(() => {
+            toast.remove();
+        }, 500);
+    }, 3000);
+}
