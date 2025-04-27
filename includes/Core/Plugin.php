@@ -13,9 +13,17 @@ class Plugin {
         $this->assets = new Assets($plugin_file);
         // Admin Menu
          new Menu($plugin_file);
-        // $this->assets->enqueue('shopspark-script', 'assets/js/script.js', ['jquery'], '1.0.0', true);
-        // $this->assets->enqueue_style('shopspark-style', 'assets/css/style.css', [], '1.0.0');
+        
+        add_action('wp_enqueue_scripts', [$this, 'load_global_assets']);
+    }
 
+    /**
+     * Load global assets
+     * @return void
+     */
+    public function load_global_assets(): void {
+        // $this->assets->enqueue('shopspark-script', 'assets/js/script.js', ['jquery'], '1.0.0', true);
+        $this->assets->enqueue_style('shopspark-style', 'assets/css/style.css', [], '1.0.0');
     }
 
     public function init(): void {
@@ -23,6 +31,7 @@ class Plugin {
 
         $this->register_modules([
             \ShopSpark\Modules\QuickView\QuickViewServiceProvider::class,
+            \ShopSpark\Modules\LoadMore\LoadMoreServiceProvider::class,
             // \ShopSpark\Modules\SideCart\SideCartServiceProvider::class,
             // Add more modules here
         ]);

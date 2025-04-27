@@ -478,96 +478,95 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
     public function settings() {
             $options = $this->settings;
             ?>
+            <div class="max-w-5xl mx-auto">
+                <h2 class="!text-3xl !font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2">
+                    <?php _e('Quick View Settings', 'shopspark'); ?>
+                </h2>
+                <form method="post" action="options.php" class="space-y-6" x-data="{ 
+                                    btnText: '<?php echo esc_js($options['quick_view_text'] ?? 'Quick View'); ?>', 
+                                    modalSize: '<?php echo esc_js($options['quick_view_modal_size'] ?? 'medium'); ?>',
+                                    imageSize: '<?php echo esc_js($options['quick_view_image_size'] ?? 'medium'); ?>',
+                                    buttonColor: '<?php echo esc_js($options['quick_view_button_color'] ?? '#3b82f6'); ?>'
+                                }">
+                    <?php settings_fields('shopspark_quick_view_settings'); ?>
 
-<div class="max-w-5xl mx-auto">
-    <h2 class="!text-3xl !font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2">
-        <?php _e('Quick View Settings', 'shopspark'); ?>
-    </h2>
-    <form method="post" action="options.php" class="space-y-6" x-data="{ 
-                        btnText: '<?php echo esc_js($options['quick_view_text'] ?? 'Quick View'); ?>', 
-                        modalSize: '<?php echo esc_js($options['quick_view_modal_size'] ?? 'medium'); ?>',
-                        imageSize: '<?php echo esc_js($options['quick_view_image_size'] ?? 'medium'); ?>',
-                        buttonColor: '<?php echo esc_js($options['quick_view_button_color'] ?? '#3b82f6'); ?>'
-                    }">
-        <?php settings_fields('shopspark_quick_view_settings'); ?>
+                    <!-- Quick View Button Text Input -->
+                    <?php
+                                echo TemplateFunctions::moduleInputField(
+                                    'shopspark_quick_view_settings[quick_view_text]',
+                                    __('Quick View Button Text', 'shopspark'),
+                                    'btnText',
+                                    'Quick View',
+                                    '!important',
+                                    __('e.g., Quick View', 'shopspark'),
+                                    '',
+                                    '',
+                                    true
+                                );
 
-        <!-- Quick View Button Text Input -->
+                                // Quick View Modal Size Dropdown
+                                echo TemplateFunctions::moduleDropdownField(
+                                    'shopspark_quick_view_settings[quick_view_modal_size]',
+                                    __('Quick View Modal Size', 'shopspark'),
+                                    ['small', 'medium', 'large'],
+                                    $options['quick_view_modal_size'] ?? 'medium',
+                                    'modalSize'
+                                );
+
+                            // Quick View Button Position
+                                echo TemplateFunctions::moduleDropdownField(
+                                    'shopspark_quick_view_settings[quick_view_button_position]',
+                                    __('Quick View Button Position', 'shopspark'),
+                                    [
+                                        'woocommerce_before_shop_loop_item'        => __('Before Product Link Start', 'shopspark'),
+                                        'woocommerce_before_shop_loop_item_title'  => __('Before Product Title', 'shopspark'),
+                                        'woocommerce_shop_loop_item_title'         => __('Product Title', 'shopspark'),
+                                        'woocommerce_after_shop_loop_item_title'   => __('After Product Title', 'shopspark'),
+                                        'woocommerce_after_shop_loop_item'         => __('After Product Link End', 'shopspark'),
+                                    ],
+                                    $options['quick_view_button_position'] ?? 'woocommerce_after_shop_loop_item',
+                                    'buttonPosition'
+                                );
+
+                                // Quick View Button Position, Left or Right, center
+                                echo TemplateFunctions::moduleDropdownField(
+                                    'shopspark_quick_view_settings[quick_view_button_alignment]',
+                                    __('Quick View Button Position', 'shopspark'),
+                                    [
+                                        'left' => __('Left', 'shopspark'),
+                                        'right' => __('Right', 'shopspark'),
+                                        'center' => __('Center', 'shopspark'),
+                                    ],
+                                    $options['quick_view_button_alignment'] ?? 'center',
+                                    'buttonPosition'
+                                );
+
+                                // Quick View Image Size Dropdown
+                                echo TemplateFunctions::moduleDropdownField(
+                                    'shopspark_quick_view_settings[quick_view_image_size]',
+                                    __('Quick View Image Size', 'shopspark'),
+                                    ['small', 'medium', 'large'],
+                                    $options['quick_view_image_size'] ?? 'medium',
+                                    'imageSize'
+                                );
+                                ?>
+
+                        <!-- Quick View Button Color -->
+                        <div>
+                            <label for="quick_view_button_color" class="block text-sm font-medium text-gray-700 mb-1">
+                                <?php _e('Quick View Button Color', 'shopspark'); ?>
+                            </label>
+                            <input type="color" id="quick_view_button_color"
+                                name="shopspark_quick_view_settings[quick_view_button_color]" x-model="buttonColor"
+                                class="w-16 h-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+                        </div>
+
+                    <!-- Save Button -->
+                    <?php echo TemplateFunctions::saveButton(); ?>
+
+                </form>
+            </div>
         <?php
-                    echo TemplateFunctions::moduleInputField(
-                        'shopspark_quick_view_settings[quick_view_text]',
-                        __('Quick View Button Text', 'shopspark'),
-                        'btnText',
-                        'Quick View',
-                        '!important',
-                        __('e.g., Quick View', 'shopspark'),
-                        '',
-                        '',
-                        true
-                    );
-
-                    // Quick View Modal Size Dropdown
-                    echo TemplateFunctions::moduleDropdownField(
-                        'shopspark_quick_view_settings[quick_view_modal_size]',
-                        __('Quick View Modal Size', 'shopspark'),
-                        ['small', 'medium', 'large'],
-                        $options['quick_view_modal_size'] ?? 'medium',
-                        'modalSize'
-                    );
-
-                 // Quick View Button Position
-                    echo TemplateFunctions::moduleDropdownField(
-                        'shopspark_quick_view_settings[quick_view_button_position]',
-                        __('Quick View Button Position', 'shopspark'),
-                        [
-                            'woocommerce_before_shop_loop_item'        => __('Before Product Link Start', 'shopspark'),
-                            'woocommerce_before_shop_loop_item_title'  => __('Before Product Title', 'shopspark'),
-                            'woocommerce_shop_loop_item_title'         => __('Product Title', 'shopspark'),
-                            'woocommerce_after_shop_loop_item_title'   => __('After Product Title', 'shopspark'),
-                            'woocommerce_after_shop_loop_item'         => __('After Product Link End', 'shopspark'),
-                        ],
-                        $options['quick_view_button_position'] ?? 'woocommerce_after_shop_loop_item',
-                        'buttonPosition'
-                    );
-
-                    // Quick View Button Position, Left or Right, center
-                    echo TemplateFunctions::moduleDropdownField(
-                        'shopspark_quick_view_settings[quick_view_button_alignment]',
-                        __('Quick View Button Position', 'shopspark'),
-                        [
-                            'left' => __('Left', 'shopspark'),
-                            'right' => __('Right', 'shopspark'),
-                            'center' => __('Center', 'shopspark'),
-                        ],
-                        $options['quick_view_button_alignment'] ?? 'center',
-                        'buttonPosition'
-                    );
-
-                    // Quick View Image Size Dropdown
-                    echo TemplateFunctions::moduleDropdownField(
-                        'shopspark_quick_view_settings[quick_view_image_size]',
-                        __('Quick View Image Size', 'shopspark'),
-                        ['small', 'medium', 'large'],
-                        $options['quick_view_image_size'] ?? 'medium',
-                        'imageSize'
-                    );
-                    ?>
-
-        <!-- Quick View Button Color -->
-        <div>
-            <label for="quick_view_button_color" class="block text-sm font-medium text-gray-700 mb-1">
-                <?php _e('Quick View Button Color', 'shopspark'); ?>
-            </label>
-            <input type="color" id="quick_view_button_color"
-                name="shopspark_quick_view_settings[quick_view_button_color]" x-model="buttonColor"
-                class="w-16 h-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
-        </div>
-
-        <!-- Save Button -->
-        <?php echo TemplateFunctions::saveButton(); ?>
-
-    </form>
-</div>
-<?php
     }
 
     public function shopspark_ajax_add_to_cart() {
