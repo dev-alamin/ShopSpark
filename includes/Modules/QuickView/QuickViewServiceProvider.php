@@ -217,6 +217,13 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
                     $this->render_product_variations($product);
                     $this->render_product_description($product);
             ?>
+
+                <!-- Read More Button -->
+            <div class="mt-4">
+                <a href="<?php echo esc_url(get_permalink($product->get_id())); ?>" class="button inline-block px-4 py-2 bg-inherit text-white rounded hover:bg-primary-dark transition flex items-center justify-center gap-2">
+                    <?php _e('Read More', 'shopspark'); ?>
+                </a>
+            </div>
         </div>
         <?php
     }
@@ -237,17 +244,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
                     <label for="quantity_<?php echo esc_attr($product->get_id()); ?>" class="block font-medium mb-1">
                         <?php esc_html_e('Quantity', 'shopspark'); ?>
                     </label>
-                    <input
-                        type="number"
-                        id="quantity_<?php echo esc_attr($product->get_id()); ?>"
-                        class="w-24 border border-gray-300 rounded px-3 py-2"
-                        name="quantity"
-                        value="1"
-                        min="1"
-                        <?php if ( $product->managing_stock() && $product->get_stock_quantity() > 0 ) : ?>
-                            max="<?php echo esc_attr($product->get_stock_quantity()); ?>"
-                        <?php endif; ?>
-                    >
+                    <?php $this->quantity_btn( $product ); ?>
                 </div>
 
                 <button type="submit"
@@ -285,18 +282,50 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
                     <div class="grouped-product-item mb-4">
                         <label class="flex items-center space-x-2">
                             <?php if ($child_product->is_sold_individually()) : ?>
-                                <input type="checkbox" name="quantity[<?php echo esc_attr($child_id); ?>]" value="1">
+                                <!-- If the product is sold individually, display a checkbox -->
+                                <input 
+                                    type="checkbox" 
+                                    name="quantity[<?php echo esc_attr($child_id); ?>]" 
+                                    value="1" 
+                                    <?php echo ( $child_product->is_in_stock() ? '' : 'disabled' ); ?>
+                                >
                             <?php else : ?>
-                                <input type="number"
-                                    name="quantity[<?php echo esc_attr($child_id); ?>]"
-                                    value="0"
-                                    min="0"
-                                    class="w-16 border border-gray-300 rounded px-2 py-1">
+                                <!-- For non-individually sold products, display a quantity input with plus/minus buttons -->
+                                <div class="quantity-adjuster flex items-center space-x-2">
+                                    <!-- Decrease Button -->
+                                    <button 
+                                        type="button" 
+                                        class="quantity-btn decrease" 
+                                        onclick="adjustQuantity('decrease', <?php echo esc_attr($child_id); ?>)"
+                                    >-</button>
+
+                                    <!-- Number Input for Quantity -->
+                                    <input 
+                                        type="number"
+                                        id="quantity_<?php echo esc_attr($child_id); ?>"
+                                        name="quantity[<?php echo esc_attr($child_id); ?>]"
+                                        value="0"
+                                        min="0"
+                                        class="w-16 border border-gray-300 rounded px-2 py-1 text-center"
+                                        <?php echo ( $child_product->is_in_stock() ? '' : 'disabled' ); ?>
+                                    >
+
+                                    <!-- Increase Button -->
+                                    <button 
+                                        type="button" 
+                                        class="quantity-btn increase" 
+                                        onclick="adjustQuantity('increase', <?php echo esc_attr($child_id); ?>)"
+                                    >+</button>
+                                </div>
                             <?php endif; ?>
-    
-                            <span><?php echo esc_html($child_product->get_name()); ?> - <?php echo wc_price($child_product->get_price()); ?></span>
+
+                            <span>
+                                <?php echo esc_html($child_product->get_name()); ?> 
+                                - <?php echo wc_price($child_product->get_price()); ?>
+                            </span>
                         </label>
                     </div>
+
                 <?php endforeach; ?>
     
                 <button type="submit"
@@ -346,7 +375,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
                 <input type="hidden" name="product_id" value="<?php echo esc_attr($product_id); ?>">
                 <input type="hidden" name="variation_id" class="variation_id" value="">
-
+                <?php $this->quantity_btn( $product ); ?>
                 <button type="submit"
                     class="add-to-cart-btn mt-4 inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                     <?php esc_html_e( 'Add to Cart', 'shopspark' ); ?>
@@ -354,6 +383,43 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
             </form>
         </div>
         <?php
+    }
+
+    private function quantity_btn( $product ) {
+        // Check if the product is a variation or a simple product
+        $is_variation = $product->is_type( 'variation' );
+        $is_grouped = $product->is_type( 'grouped' );
+        ?>
+        <div class="quantity-adjuster mb-4">
+            <button 
+                type="button" 
+                class="quantity-btn decrease" 
+                onclick="adjustQuantity('decrease', <?php echo esc_attr($product->get_id()); ?>)"
+            >-</button>
+            
+            <input
+                type="number"
+                id="quantity_<?php echo esc_attr($product->get_id()); ?>"
+                class="w-24 border border-gray-300 rounded px-3 py-2 text-center"
+                name="quantity"
+                value="1"
+                min="1"
+                <?php if ( !$is_grouped && !$is_variation && $product->managing_stock() && $product->get_stock_quantity() > 0 ) : ?>
+                    max="<?php echo esc_attr($product->get_stock_quantity()); ?>"
+                <?php elseif ( $is_variation ) : ?>
+                    max="<?php echo esc_attr($product->get_variation()->get_stock_quantity()); ?>"
+                <?php elseif ( $is_grouped ) : ?>
+                    max="99" <!-- Adjust as necessary for grouped product -->
+                <?php endif; ?>
+            >
+    
+            <button 
+                type="button" 
+                class="quantity-btn increase" 
+                onclick="adjustQuantity('increase', <?php echo esc_attr($product->get_id()); ?>)"
+            >+</button>
+        </div>
+    <?php
     }
 
     // Render full product description
@@ -367,7 +433,6 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
         </div>
         <?php
     }
-    
 
     private function mapHook(){
         $options = $this->settings;
@@ -545,10 +610,11 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
             // Show success message
             wp_send_json_success([
-                'message' => $message,
-                'tot_message' => $total_in_cart_message,
-                'cart_count' => WC()->cart->get_cart_contents_count(),
-                'cart_url' => wc_get_cart_url()
+                'added_message' => __('Added to cart!', 'shopspark'),
+                'message'       => $message,
+                'tot_message'   => $total_in_cart_message,
+                'cart_count'    => WC()->cart->get_cart_contents_count(),
+                'cart_url'      => wc_get_cart_url()
             ]);
         } else {
             wp_send_json_error(['message' => __('Could not add to cart.', 'shopspark')]);

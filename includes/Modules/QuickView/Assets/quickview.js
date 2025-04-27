@@ -131,10 +131,10 @@ function initQuickViewGallery() {
                     const addToCartButton = form.querySelector('.add-to-cart-btn');
                     if (addToCartButton) {
                         addToCartButton.innerHTML = `
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <span>${data.data.added_message}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            <span><?php esc_html_e('Added', 'shopspark'); ?></span>
                         `;
                     }
 
@@ -225,3 +225,38 @@ function showShopSparkToast(message, type = 'success', isCartCountMessage = fals
         }, 500);
     }, 3000);
 }
+
+function adjustQuantity(action, productId) {
+    var quantityInput = document.getElementById('quantity_' + productId); 
+    var currentValue = parseInt(quantityInput.value);  // Current quantity
+    var maxQuantity = parseInt(quantityInput.max) || Infinity;  // Max allowed quantity
+    var minQuantity = parseInt(quantityInput.min) || 1;  // Min allowed quantity
+    var step = parseInt(quantityInput.step) || 1;  // Step for increment/decrement
+
+    if (action === 'increase') {
+        if (currentValue < maxQuantity) {
+            // Increase quantity
+            quantityInput.value = currentValue + step;
+        }
+    } else if (action === 'decrease') {
+        if (currentValue > minQuantity) {
+            // Decrease quantity
+            quantityInput.value = currentValue - step;
+        }
+    }
+}
+
+// Event listener for plus and minus buttons
+document.querySelectorAll('.plus').forEach(button => {
+    button.addEventListener('click', function() {
+        var productId = this.getAttribute('data-product-id');
+        adjustQuantity('increase', productId);
+    });
+});
+
+document.querySelectorAll('.minus').forEach(button => {
+    button.addEventListener('click', function() {
+        var productId = this.getAttribute('data-product-id');
+        adjustQuantity('decrease', productId);
+    });
+});
