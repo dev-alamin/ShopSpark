@@ -1,0 +1,5 @@
+.swiper-slide-thumb-active img {
+    transform: scale(.98);
+    border: 2px solid lightsteelblue;
+    border-radius: 5px;
+}

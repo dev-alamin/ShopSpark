@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', function () {
     
             // ✅ Run this AFTER content is inserted
             initQuickViewGallery();
+
+            // Initialize the variation form
+            initVariationForm();
         });
     
 
@@ -76,6 +79,8 @@ function initQuickViewGallery() {
       slidesPerView: 4,
       freeMode: true,
       watchSlidesProgress: true,
+      watchSlidesVisibility: true, // helps auto-scroll to active
+      slideToClickedSlide: true,   // allows clicking a thumb to jump
     });
   
     const main = new Swiper('.main-gallery', {
@@ -85,6 +90,42 @@ function initQuickViewGallery() {
       thumbs: {
         swiper: thumbs,
       },
+      on: {
+        slideChange: function () {
+          // scroll thumbnail into view if needed
+          thumbs.slideTo(this.realIndex);
+        }
+      }
+    });
+  }
+  
+  /**
+   * Initialize the variation form for product variations.
+   * This function listens for changes in the variation select fields
+   * and updates the variation ID accordingly.
+   */
+  function initVariationForm() {
+    // Listen to change events on variation selects
+    document.body.addEventListener('change', function(e) {
+        if (e.target.closest('.variations_form')) {
+            const form           = e.target.closest('.variations_form');
+            const data           = new FormData(form);
+            const variationsJSON = form.dataset.product_variations;
+            const variations     = JSON.parse(variationsJSON);
+
+            let matching = variations.find(variation => {
+                return Object.keys(variation.attributes).every(attrName => {
+                    const fieldName = 'attribute_' + attrName.replace('attribute_', '');
+                    return (!variation.attributes[attrName] || variation.attributes[attrName] === data.get(fieldName));
+                });
+            });
+
+            if (matching) {
+                form.querySelector('.variation_id').value = matching.variation_id;
+            } else {
+                form.querySelector('.variation_id').value = '';
+            }
+        }
     });
   }
   

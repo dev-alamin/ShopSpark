@@ -28,6 +28,9 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
         add_action('wp_ajax_shopspark_quick_view', [ $this, 'shopspark_handle_quick_view' ]);
         add_action('wp_ajax_nopriv_shopspark_quick_view', [ $this, 'shopspark_handle_quick_view' ]);
+
+        // add_action('wp_ajax_shopspark_add_to_cart', [$this, 'shopspark_ajax_add_to_cart' ] );
+        // add_action('wp_ajax_nopriv_shopspark_add_to_cart', [$this, 'shopspark_ajax_add_to_cart' ] );
     }
 
     public function enqueue_scripts(): void {
@@ -35,8 +38,19 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
             'shopspark-quickview',
             plugin_dir_url(__FILE__) . 'Assets/quickview.js',
             ['jquery'],
-            '1.0.0',
+            time(),
             true
+        );
+
+        // Enqueue WooCommerce scripts, need to use condition later on
+        wp_enqueue_script('wc-add-to-cart-variation');
+
+        wp_enqueue_style(
+            'shopspark-quickview',
+            plugin_dir_url(__FILE__) . 'Assets/quickview.css',
+            [],
+            time(),
+            'all'
         );
         
 
@@ -49,9 +63,6 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
         // Tailwind JS 
         wp_enqueue_script( 'shopspark-tailwindjs', '//cdn.jsdelivr.net/npm/@tailwindcss/browser@4' );
-
-        // Alpine JS CDN
-        wp_enqueue_script('shopspark-alpine', '//cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', [], '3.0.0', true);
 
         wp_enqueue_style('swiper', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css');
         
@@ -111,7 +122,8 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
                     id="shopspark-quick-view-close">
                     &times;
                 </button>
-                <div id="shopspark-quick-view-content" class="min-h-[200px] flex items-center justify-center gap-5">
+                <div id="shopspark-quick-view-content" class="min-h-[200px] md:flex md:justify-center md:gap-5">
+
                     <!-- Product content will load here -->
 
                 </div>
@@ -147,20 +159,22 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
     private function render_product_images($product) {
         $main_image_id = $product->get_image_id();
         $gallery_images = $product->get_gallery_image_ids();
+
+        if( $gallery_images && is_array($gallery_images) ) :
     
         if ($main_image_id) {
             array_unshift($gallery_images, $main_image_id);
         }
     
         ?>
-        <div class="product-gallery">
-            <!-- Main Gallery -->
+        <div class="product-gallery w-full md:max-w-[60%]">
+        <!-- Main Gallery -->
             <div class="swiper main-gallery mb-4 max-w-xl mx-auto">
                 <div class="swiper-wrapper">
                     <?php foreach ($gallery_images as $img_id): ?>
                         <div class="swiper-slide">
                             <?php echo wp_get_attachment_image($img_id, 'large', false, [
-                                'class' => 'rounded-xl max-h-[400px] w-full object-contain mx-auto'
+                                'class' => 'rounded-xl max-h-[400px] w-full object-cover mx-auto'
                             ]); ?>
                         </div>
                     <?php endforeach; ?>
@@ -169,9 +183,9 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
     
             <!-- Thumbnail Gallery (Below Main Image) -->
             <div class="swiper thumb-gallery mt-4 max-w-xl mx-auto">
-                <div class="swiper-wrapper flex gap-3">
+                <div class="swiper-wrapper">
                     <?php foreach ($gallery_images as $img_id): ?>
-                        <div class="swiper-slide w-24 h-24 !flex items-center justify-center border rounded-lg overflow-hidden hover:border-purple-600 transition">
+                        <div class="swiper-slide w-24 h-24 !flex items-center justify-center rounded-lg overflow-hidden hover:border-purple-600 transition">
                             <?php echo wp_get_attachment_image($img_id, 'thumbnail', false, [
                                 'class' => 'object-cover max-h-full max-w-full'
                             ]); ?>
@@ -179,8 +193,14 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
                     <?php endforeach; ?>
                 </div>
             </div>
+
         </div>
         <?php
+        else:
+            echo wp_get_attachment_image($main_image_id, 'large', false, [
+                'class' => 'rounded-xl max-h-[400px] w-full object-cover mx-auto'
+            ]);
+        endif;
     }
     
     // Render product info (name, price, etc.)
@@ -202,60 +222,139 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
     // Render product variations (for variable products)
     private function render_product_variations($product) {
         if ($product->is_type('variable')) {
-            $attributes = $product->get_variation_attributes();
-            $available_variations = $product->get_available_variations();
-            $product_id = $product->get_id();
-            ?>
-            <div class="product-variations mt-6">
-                <h3 class="text-lg font-semibold mb-2">Select Variation</h3>
-                <form class="variations_form" method="post" enctype="multipart/form-data"
-                    data-product_id="<?php echo esc_attr($product_id); ?>"
-                    data-product_variations="<?php echo esc_attr(json_encode($available_variations)); ?>">
-
-                    <?php foreach ($attributes as $attr_name => $options) : ?>
-                        <div class="variation-option mb-4">
-                            <label for="<?php echo esc_attr($attr_name); ?>" class="block font-medium mb-1">
-                                <?php echo wc_attribute_label($attr_name); ?>
-                            </label>
-                            <select name="attribute_<?php echo esc_attr(sanitize_title($attr_name)); ?>"
-                                    id="<?php echo esc_attr($attr_name); ?>"
-                                    class="w-full border border-gray-300 rounded px-3 py-2">
-                                <option value="">Choose an option</option>
-                                <?php foreach ($options as $option) : ?>
-                                    <option value="<?php echo esc_attr($option); ?>">
-                                        <?php echo esc_html(wc_attribute_label($option, $product)); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    <?php endforeach; ?>
-
-                    <input type="hidden" name="add-to-cart" value="<?php echo esc_attr($product_id); ?>">
-                    <input type="hidden" name="product_id" value="<?php echo esc_attr($product_id); ?>">
-                    <input type="hidden" name="variation_id" class="variation_id" value="">
-
-                    <button type="submit"
-                        class="add-to-cart-btn mt-4 inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
-                        <?php esc_html_e( 'Add to Cart', 'shopspark' ); ?>
-                    </button>
-                </form>
-            </div>
-            <?php
+            $this->render_variation_product_add_to_cart_data($product);
+        } elseif ($product->is_type('grouped')) {
+            $this->render_grouped_product_add_to_cart_data($product);
         } else {
             // For simple products
             ?>
             <form method="post" class="simple_add_to_cart_form">
                 <input type="hidden" name="add-to-cart" value="<?php echo esc_attr($product->get_id()); ?>">
+
+                <div class="quantity mb-4">
+                    <label for="quantity_<?php echo esc_attr($product->get_id()); ?>" class="block font-medium mb-1">
+                        <?php esc_html_e('Quantity', 'shopspark'); ?>
+                    </label>
+                    <input
+                        type="number"
+                        id="quantity_<?php echo esc_attr($product->get_id()); ?>"
+                        class="w-24 border border-gray-300 rounded px-3 py-2"
+                        name="quantity"
+                        value="1"
+                        min="1"
+                        <?php if ( $product->managing_stock() && $product->get_stock_quantity() > 0 ) : ?>
+                            max="<?php echo esc_attr($product->get_stock_quantity()); ?>"
+                        <?php endif; ?>
+                    >
+                </div>
+
+                <button type="submit"
+                    class="add-to-cart-btn mt-4 inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                    <?php esc_html_e('Add to Cart', 'shopspark'); ?>
+                </button>
+            </form>
+
+            <?php
+        }
+    }
+    
+    /**
+     * Render grouped product add to cart data
+     *
+     * @param $product
+     * @return void
+     */
+    private function render_grouped_product_add_to_cart_data($product) {
+        $grouped_products = $product->get_children(); // Get associated product IDs
+        ?>
+        <div class="grouped-products-form mt-6">
+            <h3 class="text-lg font-semibold mb-2"><?php esc_html_e('Select Products', 'shopspark'); ?></h3>
+    
+            <form class="grouped_products_form cart" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="add-to-cart" value="<?php echo esc_attr($product->get_id()); ?>">
+    
+                <?php foreach ($grouped_products as $child_id) :
+                    $child_product = wc_get_product($child_id);
+    
+                    if (!$child_product || !$child_product->is_purchasable()) {
+                        continue;
+                    }
+                ?>
+                    <div class="grouped-product-item mb-4">
+                        <label class="flex items-center space-x-2">
+                            <?php if ($child_product->is_sold_individually()) : ?>
+                                <input type="checkbox" name="quantity[<?php echo esc_attr($child_id); ?>]" value="1">
+                            <?php else : ?>
+                                <input type="number"
+                                    name="quantity[<?php echo esc_attr($child_id); ?>]"
+                                    value="0"
+                                    min="0"
+                                    class="w-16 border border-gray-300 rounded px-2 py-1">
+                            <?php endif; ?>
+    
+                            <span><?php echo esc_html($child_product->get_name()); ?> - <?php echo wc_price($child_product->get_price()); ?></span>
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+    
+                <button type="submit"
+                    class="add-to-cart-btn mt-4 inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                    <?php esc_html_e('Add Selected to Cart', 'shopspark'); ?>
+                </button>
+            </form>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Render variation product add to cart data
+     *
+     * @param $product
+     * @return void
+     */
+    private function render_variation_product_add_to_cart_data($product) {
+        $attributes           = $product->get_variation_attributes();
+        $available_variations = $product->get_available_variations();
+        $product_id           = $product->get_id();
+        ?>
+        <div class="product-variations mt-6">
+            <h3 class="text-lg font-semibold mb-2"><?php esc_html_e( 'Select Variation', 'shopspark' ); ?></h3>
+            <form class="variations_form cart" method="post" enctype="multipart/form-data"
+            data-product_id="<?php echo esc_attr($product_id); ?>"
+            data-product_variations="<?php echo esc_attr(json_encode($available_variations, JSON_HEX_TAG)); ?>">
+
+
+                <?php foreach ($attributes as $attr_name => $options) : ?>
+                    <div class="variation-option mb-4">
+                        <label for="<?php echo esc_attr($attr_name); ?>" class="block font-medium mb-1">
+                            <?php echo wc_attribute_label($attr_name); ?>
+                        </label>
+                        <select name="attribute_<?php echo esc_attr(sanitize_title($attr_name)); ?>"
+                                id="<?php echo esc_attr($attr_name); ?>"
+                                class="w-full border border-gray-300 rounded px-3 py-2 custom-variation-select">
+                            <option value=""><?php esc_html_e( 'Choose an option', 'shopspark' ); ?></option>
+                            <?php foreach ($options as $option) : ?>
+                                <option value="<?php echo esc_attr($option); ?>">
+                                    <?php echo esc_html(ucfirst(wc_attribute_label($option, $product))); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                <?php endforeach; ?>
+
+                <input type="hidden" name="add-to-cart" value="<?php echo esc_attr($product_id); ?>">
+                <input type="hidden" name="product_id" value="<?php echo esc_attr($product_id); ?>">
+                <input type="hidden" name="variation_id" class="variation_id" value="">
+
                 <button type="submit"
                     class="add-to-cart-btn mt-4 inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                     <?php esc_html_e( 'Add to Cart', 'shopspark' ); ?>
                 </button>
             </form>
-            <?php
-        }
+        </div>
+        <?php
     }
 
-    
     // Render full product description
     private function render_product_description($product) {
         ?>
@@ -403,6 +502,39 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
     </form>
 </div>
 <?php
+    }
+
+    public function shopspark_ajax_add_to_cart() {
+        // Validate input
+        $product_id = intval($_POST['product_id'] ?? 0);
+        $variation_id = intval($_POST['variation_id'] ?? 0);
+        $quantity = intval($_POST['quantity'] ?? 1);
+    
+        $attributes = array_filter($_POST, function($key) {
+            return strpos($key, 'attribute_') === 0;
+        }, ARRAY_FILTER_USE_KEY);
+    
+        if (!$product_id || !$variation_id) {
+            wp_send_json_error(['message' => __('Invalid product.', 'shopspark')]);
+        }
+    
+        $passed_validation = apply_filters('woocommerce_add_to_cart_validation', true, $product_id, $quantity);
+    
+        if (!$passed_validation) {
+            wp_send_json_error(['message' => __('Failed validation.', 'shopspark')]);
+        }
+    
+        // // Attempt to add to cart
+        $added = WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $attributes);
+    
+        if ($added) {
+            // Optional: trigger WooCommerce notice hooks here if needed
+            wp_send_json_success(['message' => __('Added to cart!', 'shopspark')]);
+        } else {
+            wp_send_json_error(['message' => __('Could not add to cart.', 'shopspark')]);
+        }
+
+        wp_die();
     }
     
 }
