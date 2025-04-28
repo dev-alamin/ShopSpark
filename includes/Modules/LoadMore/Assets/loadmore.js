@@ -1,157 +1,144 @@
 "use strict";
 
 document.addEventListener('DOMContentLoaded', function () {
-    const loadMoreButton = document.getElementById('load-more-products');
-    const productContainer = document.querySelector('.products') || document.querySelector('.wc-block-product-template__responsive'); // Your product grid container
-    const paginationLinks = document.querySelectorAll('.woocommerce-pagination .page-numbers'); // Pagination links
+    const productContainer = document.querySelector('.products') || document.querySelector('.wc-block-product-template__responsive');
+    const paginationContainer = document.querySelector('.woocommerce-pagination');
 
-    let currentPage = getCurrentPageFromUrl(); // Get the initial page from the URL
+    let currentPage = getCurrentPageFromUrl();
 
-    // Set the initial data-page attribute on the button
-    if (loadMoreButton) {
-        loadMoreButton.setAttribute('data-page', currentPage);
-    }
-
-    // Function to get the current page number from the URL
+    // Get current page from URL
     function getCurrentPageFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        let page = 1; // Default to page 1
-        const pageMatch = window.location.pathname.match(/\/page\/(\d+)/);
-        if (pageMatch && pageMatch[1]) {
-            page = parseInt(pageMatch[1]);
-        }
-        return page;
+        const match = window.location.pathname.match(/\/page\/(\d+)/);
+        return match ? parseInt(match[1]) : 1;
     }
 
-    // Function to update the URL with the current page
+    // Generate a page URL
+    function generatePageUrl(pageNumber) {
+        const baseUrl = loadmore_params.shop_url || window.location.origin + '/shop/';
+        return pageNumber === 1 ? baseUrl : `${baseUrl}page/${pageNumber}/`;
+    }
+    // Update browser URL without reloading
     function updateUrlWithPage(page) {
-        const newUrl = `${window.location.origin}/shop/page/${page}/`;
-        history.pushState({ page: page }, '', newUrl); // Update URL to reflect current page
+        const newUrl = generatePageUrl(page);
+        history.pushState({ page: page }, '', newUrl);
     }
-    
 
-    // Function to replace products with the new ones
-    function replaceProductsWithNew(responseHtml) {
-        // If the response is empty, stop the process (no more products)
-        if (responseHtml.trim() === '' || responseHtml == null) {
-            loadMoreButton.style.display = 'none'; // Hide the button when no more products are available
-            return;
-        }
-        
-        // Replace the existing products with the new ones
+    // Replace products with new HTML
+    function replaceProducts(responseHtml) {
+        if (responseHtml.trim() === '' || !productContainer) return;
         productContainer.innerHTML = responseHtml;
     }
 
-    // Function to load more products based on page
-    function loadMoreProducts(page = currentPage) {
+    // Handle loading products via AJAX
+    function loadProducts(page) {
         currentPage = page;
-
-        if (page !== currentPage) {
-            productContainer.innerHTML = ''; // Clear the old products if going to a new page
-        }
 
         const data = new FormData();
         data.append('action', 'load_more_products');
         data.append('page', currentPage);
 
-        // Make the Fetch request
         fetch(loadmore_params.ajax_url, {
             method: 'POST',
             body: data,
         })
-        .then(response => response.text())
-        .then(responseHtml => {
-            replaceProductsWithNew(responseHtml);
-            loadMoreButton.setAttribute('data-page', currentPage); // Update the button's page number
-            updateUrlWithPage(currentPage); // Update the URL to reflect the current page
+        .then(response => response.json())
+        .then(response => {
+            if (response.success) {
+                document.querySelector('.woocommerce-pagination').setAttribute('data-total-pages', response.data.total_pages);
+                replaceProducts(response.data.content);
+                updatePaginationUI(currentPage, response.data.total_pages);
+                updateUrlWithPage(currentPage);
+            } else {
+                console.error('Failed to load products.');
+            }
         })
         .catch(error => {
-            console.error('Error loading more products:', error);
+            console.error('Error loading products:', error);
         });
     }
 
-    // Function to handle button click event
-    function handleButtonClick() {
-        currentPage++; // Increment the page number when the button is clicked
-        loadMoreProducts(currentPage); // Load products for the next page
-    }
+    // Update pagination UI (highlight current page, update next/prev href)
+    function updatePaginationUI(newPage, maxPage) {
+        if (!paginationContainer) return;
 
-    // Function to handle infinite scroll using IntersectionObserver
-    function handleInfiniteScroll() {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    loadMoreProducts(currentPage + 1); // Increment page number for infinite scroll
-                }
-            });
-        }, {
-            rootMargin: '100px', // Trigger before the end of the page
-        });
+        // Update number links
+        const currentActive = paginationContainer.querySelector('span.current');
+        if (currentActive) {
+            const pageNumber = currentActive.innerText;
+            const newLink = document.createElement('a');
+            newLink.className = 'page-numbers';
+            newLink.href = generatePageUrl(parseInt(pageNumber));
+            newLink.innerText = pageNumber;
+            currentActive.parentNode.replaceChild(newLink, currentActive);
+        }
 
-        // Target the button itself (or any other element to trigger scroll-based load)
-        if (loadMoreButton) {
-            observer.observe(loadMoreButton);
-        }
-    }
+        const newPageLink = [...paginationContainer.querySelectorAll('a.page-numbers')]
+            .find(link => parseInt(link.innerText) === newPage);
 
-    // Function to handle pagination link click event
-    function handlePaginationLinkClick(event) {
-        event.preventDefault(); // Prevent the default link behavior
-    
-        const pageLink = event.target;
-        
-        // Check if the clicked element is a valid pagination link (number or arrow)
-        if (!pageLink.classList.contains('page-numbers')) {
-            return; // Ignore clicks on non-pagination links
+        if (newPageLink) {
+            const newSpan = document.createElement('span');
+            newSpan.className = 'page-numbers current';
+            newSpan.innerText = newPage;
+            newPageLink.parentNode.replaceChild(newSpan, newPageLink);
         }
-    
-        let page;
-    
-        // If it's a page number
-        if (!isNaN(parseInt(pageLink.innerText))) {
-            page = parseInt(pageLink.innerText);
-        }
-    
-        // Handle the "Previous" and "Next" buttons
-        if (pageLink.classList.contains('prev') || pageLink.classList.contains('next')) {
-            if (pageLink.classList.contains('prev')) {
-                page = currentPage - 1; // Go to the previous page
-            } else if (pageLink.classList.contains('next')) {
-                page = currentPage + 1; // Go to the next page
+
+        // Update Prev/Next
+        const prevButton = paginationContainer.querySelector('a.prev');
+        const nextButton = paginationContainer.querySelector('a.next');
+
+        if (prevButton) {
+            if (newPage > 1) {
+                prevButton.href = generatePageUrl(newPage - 1);
+                prevButton.classList.remove('disabled');
+            } else {
+                prevButton.href = '#';
+                prevButton.classList.add('disabled');
             }
         }
-    
-        // Ensure that the page is a valid number (positive and not beyond the max page)
-        if (isNaN(page) || page < 1) {
-            return; // Invalid page, do nothing
-        }
-    
-        // Assuming you know the total number of pages (this can be set dynamically via your PHP)
-        const maxPage = parseInt(loadmore_params.total_pages); // Total number of pages, passed from PHP
-    
-        if (page > maxPage) {
-            return; // Don't load if the page exceeds the max pages
-        }
-    
-        // Update the current page and trigger loading more products
-        currentPage = page;
-        loadMoreProducts(page);
-    }
-    
 
-
-    // Attach the button click event listener
-    if (loadMoreButton) {
-        console.log('Load more button found');
-        loadMoreButton.addEventListener('click', handleButtonClick);
+        if (nextButton) {
+            if (newPage < maxPage) {
+                nextButton.href = generatePageUrl(newPage + 1);
+                nextButton.classList.remove('disabled');
+            } else {
+                nextButton.href = '#';
+                nextButton.classList.add('disabled');
+            }
+        }
     }
 
-    // Enable infinite scroll functionality (optional)
-    // handleInfiniteScroll();
+    // Handle click on any pagination link
+    function handlePaginationClick(event) {
+        event.preventDefault();
 
-    // Attach click event listeners to all pagination links
-    paginationLinks.forEach(link => {
-        link.addEventListener('click', handlePaginationLinkClick);
-    });
+        const target = event.target;
+        if (!target.classList.contains('page-numbers')) return;
 
+        let page;
+
+        if (target.classList.contains('prev')) {
+            page = currentPage - 1;
+        } else if (target.classList.contains('next')) {
+            page = currentPage + 1;
+            let maxPage = document.querySelector('.woocommerce-pagination' ).getAttribute('data-total-pages');
+            maxPage = parseInt(maxPage);
+            // Check if maxPage is null or undefined
+            
+            if( (maxPage  < page ) && maxPage !== null) {
+                return;
+            }
+
+        } else {
+            page = parseInt(target.innerText);
+        }
+
+        if (!page || page < 1) return;
+
+        loadProducts(page);
+    }
+
+    // Attach event listeners to all pagination links
+    if (paginationContainer) {
+        paginationContainer.addEventListener('click', handlePaginationClick);
+    }
 });

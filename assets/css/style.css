@@ -1,3 +1,13 @@
 ul.products, .wc-block-grid__products{
     display: flex;;
+    flex-wrap: wrap;;
 }
+
+/* .woocommerce ul.products:not(.elementor-grid), .woocommerce-page ul.products:not(.elementor-grid) {
+    grid-template-columns: repeat(4,1fr);
+}
+
+.woocommerce ul.products, .woocommerce-page ul.products {
+    display: grid;
+    column-gap: 20px;
+} */
