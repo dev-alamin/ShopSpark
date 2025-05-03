@@ -15,6 +15,18 @@
       }
     ],
     "minimum-stability": "stable",
-    "require": {}
-  }
-  
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.12",
+        "wp-coding-standards/wpcs": "^3.1"
+    },
+    "scripts": {
+    "test": "phpunit",
+    "phpcs": "phpcs --standard=WordPress src includes",
+    "phpcbf": "phpcbf --standard=WordPress ./includes"
+},
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

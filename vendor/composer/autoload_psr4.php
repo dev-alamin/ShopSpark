@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'ShopSpark\\' => array($baseDir . '/includes'),
+    'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => array($vendorDir . '/dealerdirect/phpcodesniffer-composer-installer/src'),
 );
