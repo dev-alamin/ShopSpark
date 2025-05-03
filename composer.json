@@ -21,8 +21,8 @@
     },
     "scripts": {
     "test": "phpunit",
-    "phpcs": "phpcs --standard=WordPress src includes",
-    "phpcbf": "phpcbf --standard=WordPress ./includes"
+    "phpcs": "phpcs --standard=WordPress  --ignore=*.js src includes",
+    "phpcbf": "phpcbf --standard=WordPress  --ignore=*.js ./includes"
 },
     "config": {
         "allow-plugins": {
