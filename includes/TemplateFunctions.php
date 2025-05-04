@@ -5,8 +5,8 @@ class TemplateFunctions {
 
 	public static function process_html_class( string $class ) {
 
-        return esc_attr( $class );
-    }
+		return esc_attr( $class );
+	}
 
 	/**
 	 * * ShopSpark Save Button
@@ -17,42 +17,42 @@ class TemplateFunctions {
 	 * @param string $class The CSS class for the button.
 	 * @return string The HTML for the save button.
 	 */
-    public static function saveButton( $text = 'Save Changes', $icon = 'save', $class = '' ) {
-        $defaultClasses = array(
-            'inline-flex',
-            'items-center',
-            'gap-3',
-            'px-6',
-            'py-3',
-            'bg-gradient-to-r',
-            'from-blue-500',
-            'to-blue-600',
-            'hover:from-blue-600',
-            'hover:to-blue-700',
-            'text-white',
-            'font-semibold',
-            'text-sm',
-            'rounded-full',
-            'shadow-lg',
-            'transform',
-            'transition-all',
-            'duration-200',
-            'ease-in-out',
-            'hover:scale-105',
-            'focus:outline-none',
-            'focus:ring-2',
-            'focus:ring-blue-500',
-            'focus:ring-offset-2',
-        );
+	public static function saveButton( $text = 'Save Changes', $icon = 'save', $class = '' ) {
+		$defaultClasses = array(
+			'inline-flex',
+			'items-center',
+			'gap-3',
+			'px-6',
+			'py-3',
+			'bg-gradient-to-r',
+			'from-blue-500',
+			'to-blue-600',
+			'hover:from-blue-600',
+			'hover:to-blue-700',
+			'text-white',
+			'font-semibold',
+			'text-sm',
+			'rounded-full',
+			'shadow-lg',
+			'transform',
+			'transition-all',
+			'duration-200',
+			'ease-in-out',
+			'hover:scale-105',
+			'focus:outline-none',
+			'focus:ring-2',
+			'focus:ring-blue-500',
+			'focus:ring-offset-2',
+		);
 
-        if ( $class ) {
-            $defaultClasses[] = $class;
-        }
+		if ( $class ) {
+			$defaultClasses[] = $class;
+		}
 
-        $defaultClasses = implode( ' ', $defaultClasses );
-        $defaultClasses = self::process_html_class( $defaultClasses );
-        $defaultClasses = is_array( $defaultClasses ) ? implode( ' ', $defaultClasses ) : $defaultClasses;
-        $class = $defaultClasses;
+		$defaultClasses = implode( ' ', $defaultClasses );
+		$defaultClasses = self::process_html_class( $defaultClasses );
+		$defaultClasses = is_array( $defaultClasses ) ? implode( ' ', $defaultClasses ) : $defaultClasses;
+		$class          = $defaultClasses;
 
 		$icons = array(
 			'save'  => 'M5 13l4 4L19 7',
@@ -99,32 +99,32 @@ class TemplateFunctions {
 		$id = '',
 		$required = false
 	) {
-        $default = [
-            'w-full',
-            'px-6',
-            '!py-[6px]',
-            '!pl-[16px]',
-            'text-sm',
-            '!border-gray-300',
-            '!rounded-[12px]',
-            '!shadow-md',
-            '!focus:outline-none',
-            'focus:ring-2',
-            'focus:ring-purple-500',
-            'focus:ring-offset-white',
-            'transition',
-            'bg-white',
-            'placeholder-gray-400',
-            'text-gray-900',
-        ];
+		$default = array(
+			'w-full',
+			'px-6',
+			'!py-[6px]',
+			'!pl-[16px]',
+			'text-sm',
+			'!border-gray-300',
+			'!rounded-[12px]',
+			'!shadow-md',
+			'!focus:outline-none',
+			'focus:ring-2',
+			'focus:ring-purple-500',
+			'focus:ring-offset-white',
+			'transition',
+			'bg-white',
+			'placeholder-gray-400',
+			'text-gray-900',
+		);
 
-        if ( $class ) {
-            $default[] = $class;
-        }
+		if ( $class ) {
+			$default[] = $class;
+		}
 
-        $classes = implode( ' ', $default );
-        $classes = is_array( $classes ) ? implode( ' ', $classes ) : $classes;
-        $classes = self::process_html_class( $classes );
+		$classes      = implode( ' ', $default );
+		$classes      = is_array( $classes ) ? implode( ' ', $classes ) : $classes;
+		$classes      = self::process_html_class( $classes );
 		$requiredAttr = $required ? 'required' : '';
 		$idAttr       = $id ? esc_attr( $id ) : esc_attr( $name );
 
@@ -186,30 +186,30 @@ class TemplateFunctions {
 		<label for="<?php echo $dropdownId; ?>" class="block text-sm font-semibold text-gray-800 mb-2">
 				<?php echo $fieldLabel; ?>
 			</label>
-            <?php 
-            $buttonClasses = array(
-                    'w-full',
-                    'flex',
-                    'items-center',
-                    'justify-between',
-                    'px-4',
-                    'py-2.5',
-                    'bg-white/80',
-                    'backdrop-blur',
-                    'border',
-                    'border-gray-300',
-                    'rounded-xl',
-                    'shadow-sm',
-                    'text-sm',
-                    'text-gray-800',
-                    'focus:outline-none',
-                    'focus:ring-2',
-                    'focus:ring-purple-500',
-                    'transition',
-            );
-            $buttonClasses = implode( ' ', $buttonClasses );
-            $buttonClasses = self::process_html_class( $buttonClasses );
-            ?>
+			<?php
+			$buttonClasses = array(
+				'w-full',
+				'flex',
+				'items-center',
+				'justify-between',
+				'px-4',
+				'py-2.5',
+				'bg-white/80',
+				'backdrop-blur',
+				'border',
+				'border-gray-300',
+				'rounded-xl',
+				'shadow-sm',
+				'text-sm',
+				'text-gray-800',
+				'focus:outline-none',
+				'focus:ring-2',
+				'focus:ring-purple-500',
+				'transition',
+			);
+			$buttonClasses = implode( ' ', $buttonClasses );
+			$buttonClasses = self::process_html_class( $buttonClasses );
+			?>
 			<button
 				type="button"
 				@click="open = !open"
