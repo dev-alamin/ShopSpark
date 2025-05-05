@@ -35,7 +35,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 	public function enqueue_scripts(): void {
 		wp_enqueue_script(
 			'shopspark-quickview',
-			plugin_dir_url( __FILE__ ) . 'Assets/quickview.js',
+			SHOP_SPARK_PLUGIN_ASSETS_URL . 'quick-view/quickview.js',
 			array( 'jquery' ),
 			time(),
 			true
@@ -46,7 +46,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
 		wp_enqueue_style(
 			'shopspark-quickview',
-			plugin_dir_url( __FILE__ ) . 'Assets/quickview.css',
+			SHOP_SPARK_PLUGIN_ASSETS_URL . 'quick-view/quickview.css',
 			array(),
 			time(),
 			'all'

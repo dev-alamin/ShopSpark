@@ -13,7 +13,7 @@ class LoadMoreServiceProvider implements ServiceProviderInterface {
 	public function enqueue_scripts(): void {
 		wp_enqueue_script(
 			'shopspark-loadmore',
-			plugin_dir_url( __FILE__ ) . 'Assets/loadmore.js',
+			SHOP_SPARK_PLUGIN_ASSETS_URL . 'load-more/loadmore.js',
 			array( 'jquery' ),
 			'1.0.0',
 			true
@@ -30,7 +30,7 @@ class LoadMoreServiceProvider implements ServiceProviderInterface {
 
 		wp_enqueue_style(
 			'shopspark-loadmore',
-			plugin_dir_url( __FILE__ ) . 'Assets/loadmore.css',
+			SHOP_SPARK_PLUGIN_ASSETS_URL . 'load-more/loadmore.css',
 			array(),
 			'1.0.0'
 		);
