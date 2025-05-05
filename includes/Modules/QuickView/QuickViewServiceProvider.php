@@ -37,7 +37,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 			'shopspark-quickview',
 			SHOP_SPARK_PLUGIN_ASSETS_URL . 'quick-view/quickview.js',
 			array( 'jquery', 'wc-add-to-cart-variation' ),
-			time(),
+			SHOP_SPARK_VERSION,
 			true
 		);
 
@@ -48,7 +48,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 			'shopspark-quickview',
 			SHOP_SPARK_PLUGIN_ASSETS_URL . 'quick-view/quickview.css',
 			array(),
-			time(),
+			SHOP_SPARK_VERSION,
 			'all'
 		);
 

@@ -16,12 +16,19 @@ document.addEventListener('DOMContentLoaded', function () {
     function generatePageUrl(pageNumber) {
         const baseUrl = new URL(window.location.href);
         const params = baseUrl.searchParams;
-    
-        // Remove existing pagination if any
-        const pathname = baseUrl.pathname.replace(/\/page\/\d+\/?$/, '');
-    
-        const pagePath = pageNumber === 1 ? '' : `/page/${pageNumber}`;
-        return pathname + pagePath + '?' + params.toString();
+
+        // Update the 'paged' parameter to match the page number
+        params.set('paged', pageNumber);
+
+        // Remove existing pagination from the path
+        let pathname = baseUrl.pathname.replace(/\/page\/\d+\/?$/, '');
+
+        // Ensure trailing slash consistency
+        if (!pathname.endsWith('/')) {
+            pathname += '/';
+        }
+
+        return pathname + (params.toString() ? '?' + params.toString() : '');
     }
     
     // Update browser URL without reloading

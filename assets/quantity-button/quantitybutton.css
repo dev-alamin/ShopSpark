@@ -1,0 +1,21 @@
+
+.quantity button.shopspark-plus {
+    margin-left: -3px;
+    border-radius: 0 25px 25px 0 !important;
+}
+
+.quantity button.shopspark-minus {
+    border-radius: 25px 0 0 25px !important;
+    margin-right: -3px;
+}
+.quantity button.minus:focus,
+.quantity button.plus:focus{
+    outline: none;
+}
+.quantity .input-text.qty,
+.quantity .input-text.qty:focus  {
+    box-shadow: none;
+    background: #ddd;
+    outline: none;
+}
+

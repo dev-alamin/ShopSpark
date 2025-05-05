@@ -5,10 +5,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeBtn = document.getElementById('shopspark-quick-view-close');
 
     // Open modal on click
-    document.querySelectorAll('.shopspark-quick-view-btn').forEach(button => {
-        button.addEventListener('click', function (e) {
+    // Use event delegation to handle clicks on dynamically added buttons
+    // Use event delegation to handle clicks on dynamically added buttons
+    document.body.addEventListener('click', function (e) {
+        if (e.target.classList.contains('shopspark-quick-view-btn')) {
             e.preventDefault();
-            const productId = this.getAttribute('data-product-id');
+            const productId = e.target.getAttribute('data-product-id');
             
             // Show the modal
             modal.classList.remove('hidden');
@@ -44,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             
             // TODO: Fetch and insert actual product data using AJAX
-        });
+        }
     });
 
     // Close modal
@@ -62,14 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
-
-// function initQuickViewGallery() {
-//     jQuery(document).on('click', '.gallery-thumbnail img', function () {
-//         var fullImageUrl = jQuery(this).data('full-image');
-//         jQuery('#main-product-image').attr('src', fullImageUrl);
-//         jQuery('#main-product-image').attr('srcset', fullImageUrl);
-//     });
-// }
 
 function initQuickViewGallery() {
     if (!window.Swiper) return;
@@ -99,11 +93,6 @@ function initQuickViewGallery() {
     });
   }
   
-  /**
-   * Initialize the variation form for product variations.
-   * This function listens for changes in the variation select fields
-   * and updates the variation ID accordingly.
-   */
   function initVariationForm() {
     document.body.addEventListener('submit', function(e) {
         const form = e.target;
@@ -114,6 +103,14 @@ function initQuickViewGallery() {
         ) {
             e.preventDefault();
             e.stopPropagation();
+
+            const addToCartButton = form.querySelector('.add-to-cart-btn');
+            if (!addToCartButton || addToCartButton.disabled) return;
+
+            addToCartButton.disabled = true;
+            addToCartButton.classList.add('opacity-50', 'pointer-events-none');
+
+            const originalButtonHTML = addToCartButton.innerHTML;
 
             let formData = new FormData(form);
 
@@ -127,26 +124,28 @@ function initQuickViewGallery() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Find the button inside the submitted form
-                    const addToCartButton = form.querySelector('.add-to-cart-btn');
-                    if (addToCartButton) {
-                        addToCartButton.innerHTML = `
-                            <span>${data.data.added_message}</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                        `;
-                    }
-
+                    addToCartButton.innerHTML = `
+                        <span>${data.data.added_message}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    `;
                     showShopSparkToast(data.data.message, 'success');
-                    showShopSparkToast(data.data.tot_message + ' ' +data.data.cart_count, 'success', true);
+                    showShopSparkToast(data.data.tot_message + ' ' + data.data.cart_count, 'success', true);
                     jQuery('body').trigger('wc_fragment_refresh');
                 } else {
                     showShopSparkToast(data.data.message || 'Failed to add to cart.', 'error');
+                    addToCartButton.innerHTML = originalButtonHTML;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                addToCartButton.innerHTML = originalButtonHTML;
+                showShopSparkToast('Error adding to cart.', 'error');
+            })
+            .finally(() => {
+                addToCartButton.disabled = false;
+                addToCartButton.classList.remove('opacity-50', 'pointer-events-none');
             });
         }
     });
@@ -172,8 +171,9 @@ function initQuickViewGallery() {
                 form.querySelector('.variation_id').value = '';
             }
         }
-    });    
+    });
 }
+
 
 function showShopSparkToast(message, type = 'success', isCartCountMessage = false) {
     const container = document.getElementById('shopspark-toast-container');

@@ -29,7 +29,7 @@
 
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
-define( 'SHOP_SPARK_VERSION', '1.0.0' );
+define( 'SHOP_SPARK_VERSION', WP_DEBUG ? time() : '1.0.0' );
 define( 'SHOP_SPARK_PLUGIN', __FILE__ );
 define( 'SHOP_SPARK_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'SHOP_SPARK_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );

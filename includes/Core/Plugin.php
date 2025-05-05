@@ -27,18 +27,54 @@ class Plugin {
 		$this->assets->enqueue_style( 'shopspark-style', 'assets/css/style.css', array(), '1.0.0' );
 	}
 
-	public function init(): void {
-		$this->load_textdomain();
+    /**
+     * Initialize the plugin
+     *
+     * @return void
+     */
+    public function init(): void {
+        $this->load_textdomain();
+    
+        // Get general settings with safety check
+        $settings = get_option( 'shopspark_general_settings', array() );
+        $settings = is_array( $settings ) ? $settings : array();
+    
+        // Safely read module flags
+        $quickView = ! empty( $settings['quick_view'] ) && (int) $settings['quick_view'] === 1;
+        $loadMore  = ! empty( $settings['ajax_load_more'] ) && (int) $settings['ajax_load_more'] === 1;
+        $quantityButtons = ! empty( $settings['quantity_buttons'] ) && (int) $settings['quantity_buttons'] === 1;
+    
+        $providers = array();
+    
+        if ( $quickView ) {
+            $providers[] = \ShopSpark\Modules\QuickView\QuickViewServiceProvider::class;
+        }
+    
+        if ( $loadMore ) {
+            $providers[] = \ShopSpark\Modules\LoadMore\LoadMoreServiceProvider::class;
+        }
 
-		$this->register_modules(
-			array(
-				\ShopSpark\Modules\QuickView\QuickViewServiceProvider::class,
-				\ShopSpark\Modules\LoadMore\LoadMoreServiceProvider::class,
-			// \ShopSpark\Modules\SideCart\SideCartServiceProvider::class,
-			// Add more modules here
-			)
-		);
-	}
+        if ( $quantityButtons ) {
+            $providers[] = \ShopSpark\Modules\QuatityMinPul\QualityServiceProvider::class;
+        }
+    
+        /**
+         * Allow filtering the enabled modules for future extensibility.
+         *
+         * @param array $providers The list of service provider classes to load.
+         * @param array $settings  The full general settings array.
+         */
+        $providers = apply_filters( 'shopspark_enabled_modules', $providers, $settings );
+    
+        // Register modules with class existence check
+        foreach ( $providers as $provider ) {
+            if ( class_exists( $provider ) ) {
+                $this->register_modules( [ $provider ] );
+            } else {
+                error_log( "ShopSpark module not found or not autoloaded: {$provider}" );
+            }
+        }
+    }    
 
 	protected function load_textdomain(): void {
 		load_plugin_textdomain(
