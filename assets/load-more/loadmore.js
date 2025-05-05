@@ -14,14 +14,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Generate a page URL
     function generatePageUrl(pageNumber) {
-        const baseUrl = loadmore_params.shop_url || window.location.origin + '/shop/';
-        return pageNumber === 1 ? baseUrl : `${baseUrl}page/${pageNumber}/`;
+        const baseUrl = new URL(window.location.href);
+        const params = baseUrl.searchParams;
+    
+        // Remove existing pagination if any
+        const pathname = baseUrl.pathname.replace(/\/page\/\d+\/?$/, '');
+    
+        const pagePath = pageNumber === 1 ? '' : `/page/${pageNumber}`;
+        return pathname + pagePath + '?' + params.toString();
     }
+    
     // Update browser URL without reloading
     function updateUrlWithPage(page) {
         const newUrl = generatePageUrl(page);
-        history.pushState({ page: page }, '', newUrl);
+        window.history.pushState({ page }, '', newUrl);
     }
+    
 
     // Replace products with new HTML
     function replaceProducts(responseHtml) {
@@ -139,6 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Attach event listeners to all pagination links
     const pageLinks = document.querySelectorAll('.woocommerce-pagination');
+
     if (!pageLinks) return;
     pageLinks.forEach(link => {
         link.addEventListener('click', handlePaginationClick);
