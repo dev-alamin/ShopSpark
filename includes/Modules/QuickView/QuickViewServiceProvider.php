@@ -36,7 +36,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 		wp_enqueue_script(
 			'shopspark-quickview',
 			SHOP_SPARK_PLUGIN_ASSETS_URL . 'quick-view/quickview.js',
-			array( 'jquery' ),
+			array( 'jquery', 'wc-add-to-cart-variation' ),
 			time(),
 			true
 		);

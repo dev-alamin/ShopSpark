@@ -241,3 +241,64 @@ document.querySelectorAll('.minus').forEach(button => {
         adjustQuantity('decrease', productId);
     });
 });
+
+function handleVariationChange(form) {
+    const variationIdInput = form.querySelector('.variation_id');
+    const addToCartBtn = form.querySelector('.add-to-cart-btn');
+
+    addToCartBtn.disabled = true;
+
+    const selects = form.querySelectorAll('select');
+    const selectedAttributes = {};
+
+    selects.forEach(select => {
+        const name = select.name;
+        const value = select.value;
+        if (value) {
+            selectedAttributes[name] = value;
+        }
+    });
+
+    console.log("Selected Attributes:", selectedAttributes);
+
+    if (Object.keys(selectedAttributes).length === selects.length) {
+        try {
+            const variationsData = JSON.parse(form.dataset.product_variations);
+            console.log("Variation Data:", variationsData);
+
+            const matchedVariation = variationsData.find(variation => {
+                const variationAttrs = variation.attributes;
+
+                // Only match when every key and value matches
+                return Object.keys(variationAttrs).every(key => {
+                    return selectedAttributes[key] === variationAttrs[key];
+                });
+            });
+
+            console.log("Matched Variation:", matchedVariation);
+
+            if (matchedVariation) {
+                variationIdInput.value = matchedVariation.variation_id;
+                addToCartBtn.disabled = false;
+            } else {
+                variationIdInput.value = '';
+            }
+        } catch (e) {
+            console.error("Invalid JSON in data-product_variations", e);
+        }
+    } else {
+        variationIdInput.value = '';
+    }
+}
+
+
+
+// Event listener for variation select changes
+// This form is dynamically loaded, so we use event delegation
+document.body.addEventListener('change', function(e) {
+    const form = e.target.closest('.shopspark_variations_form');
+    if (form && e.target.tagName === 'SELECT') {
+        
+        handleVariationChange(form);
+    }
+});
