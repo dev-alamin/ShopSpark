@@ -138,7 +138,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Attach event listeners to all pagination links
-    if (paginationContainer) {
-        paginationContainer.addEventListener('click', handlePaginationClick);
-    }
+    const pageLinks = document.querySelectorAll('.woocommerce-pagination');
+    if (!pageLinks) return;
+    pageLinks.forEach(link => {
+        link.addEventListener('click', handlePaginationClick);
+    });
 });

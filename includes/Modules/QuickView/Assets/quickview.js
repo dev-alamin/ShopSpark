@@ -1,20 +1,22 @@
 
 document.addEventListener('DOMContentLoaded', function () {
-    const modal = document.getElementById('shopspark-quick-view-modal');
+    const modal        = document.getElementById('shopspark-quick-view-modal');
     const modalContent = document.getElementById('shopspark-quick-view-content');
-    const closeBtn = document.getElementById('shopspark-quick-view-close');
+    const closeBtn     = document.getElementById('shopspark-quick-view-close');
 
-    // Open modal on click
-    document.querySelectorAll('.shopspark-quick-view-btn').forEach(button => {
-        button.addEventListener('click', function (e) {
-            e.preventDefault();
-            const productId = this.getAttribute('data-product-id');
-            
-            // Show the modal
-            modal.classList.remove('hidden');
+    // Delegate click events for dynamically loaded quick view buttons
+    document.body.addEventListener('click', function (e) {
+        const button = e.target.closest('.shopspark-quick-view-btn');
+        if (!button) return;
 
-            
-            modalContent.innerHTML = `
+        e.preventDefault();
+
+        const productId = button.getAttribute('data-product-id');
+
+        // Show the modal
+        modal.classList.remove('hidden');
+
+        modalContent.innerHTML = `
             <div class="text-center text-gray-700">
                 <svg class="animate-spin h-6 w-6 mx-auto text-purple-600 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
@@ -29,22 +31,14 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         fetch(shopspark_ajax.ajax_url + '?action=shopspark_quick_view&product_id=' + productId)
-        .then(res => res.text())
-        .then(html => {
-            modalContent.innerHTML = html;
-    
-            // ✅ Run this AFTER content is inserted
-            initQuickViewGallery();
+            .then(res => res.text())
+            .then(html => {
+                modalContent.innerHTML = html;
 
-            // Initialize the variation form
-            initVariationForm();
-        });
-    
-
-
-            
-            // TODO: Fetch and insert actual product data using AJAX
-        });
+                // Run this AFTER content is inserted
+                initQuickViewGallery();
+                initVariationForm();
+            });
     });
 
     // Close modal
@@ -60,16 +54,8 @@ document.addEventListener('DOMContentLoaded', function () {
             modalContent.innerHTML = '';
         }
     });
-
 });
 
-// function initQuickViewGallery() {
-//     jQuery(document).on('click', '.gallery-thumbnail img', function () {
-//         var fullImageUrl = jQuery(this).data('full-image');
-//         jQuery('#main-product-image').attr('src', fullImageUrl);
-//         jQuery('#main-product-image').attr('srcset', fullImageUrl);
-//     });
-// }
 
 function initQuickViewGallery() {
     if (!window.Swiper) return;
@@ -115,7 +101,19 @@ function initQuickViewGallery() {
             e.preventDefault();
             e.stopPropagation();
 
-            let formData = new FormData(form);
+            // Prevent double submission
+            if (form.dataset.isSubmitting === 'true') return;
+
+            form.dataset.isSubmitting = 'true'; // Lock the form
+
+            const formData = new FormData(form);
+            const addToCartButton = form.querySelector('.add-to-cart-btn');
+            const originalButtonHTML = addToCartButton?.innerHTML;
+
+            if (addToCartButton) {
+                addToCartButton.disabled = true;
+                addToCartButton.innerHTML = 'Adding...';
+            }
 
             fetch(shopspark_ajax.ajax_url, {
                 method: 'POST',
@@ -127,8 +125,6 @@ function initQuickViewGallery() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Find the button inside the submitted form
-                    const addToCartButton = form.querySelector('.add-to-cart-btn');
                     if (addToCartButton) {
                         addToCartButton.innerHTML = `
                             <span>${data.data.added_message}</span>
@@ -139,41 +135,26 @@ function initQuickViewGallery() {
                     }
 
                     showShopSparkToast(data.data.message, 'success');
-                    showShopSparkToast(data.data.tot_message + ' ' +data.data.cart_count, 'success', true);
+                    showShopSparkToast(data.data.tot_message + ' ' + data.data.cart_count, 'success', true);
                     jQuery('body').trigger('wc_fragment_refresh');
                 } else {
                     showShopSparkToast(data.data.message || 'Failed to add to cart.', 'error');
+                    if (addToCartButton) addToCartButton.innerHTML = originalButtonHTML;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                if (addToCartButton) addToCartButton.innerHTML = originalButtonHTML;
+                showShopSparkToast('Something went wrong.', 'error');
+            })
+            .finally(() => {
+                form.dataset.isSubmitting = 'false'; // Unlock
+                if (addToCartButton) addToCartButton.disabled = false;
             });
         }
     });
-
-    // Variations change listener (unchanged)
-    document.body.addEventListener('change', function(e) {
-        if (e.target.closest('.shopspark_variations_form')) {
-            const form           = e.target.closest('.shopspark_variations_form');
-            const data           = new FormData(form);
-            const variationsJSON = form.dataset.product_variations;
-            const variations     = JSON.parse(variationsJSON);
-
-            let matching = variations.find(variation => {
-                return Object.keys(variation.attributes).every(attrName => {
-                    const fieldName = 'attribute_' + attrName.replace('attribute_', '');
-                    return (!variation.attributes[attrName] || variation.attributes[attrName] === data.get(fieldName));
-                });
-            });
-
-            if (matching) {
-                form.querySelector('.variation_id').value = matching.variation_id;
-            } else {
-                form.querySelector('.variation_id').value = '';
-            }
-        }
-    });    
 }
+
 
 function showShopSparkToast(message, type = 'success', isCartCountMessage = false) {
     const container = document.getElementById('shopspark-toast-container');

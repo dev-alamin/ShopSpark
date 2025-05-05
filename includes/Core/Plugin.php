@@ -5,8 +5,6 @@ use ShopSpark\Assets;
 use ShopSpark\Admin\Menu;
 
 class Plugin {
-
-
 	protected string $plugin_file;
 	protected Assets $assets;
 

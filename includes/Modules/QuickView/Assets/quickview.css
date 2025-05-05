@@ -14,3 +14,25 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
 	-moz-appearance: textfield;
 }
+
+button.quantity-btn.increase {
+    border-radius: 0 25px 25px 0;
+}
+
+button.quantity-btn.decrease {
+    border-radius: 25px 0 0 25px;
+}
+button.quantity-btn.decrease:focus,
+button.quantity-btn.increase:focus{
+    outline: none;
+}
+.quantity-adjuster input[type="number"],
+.quantity-adjuster input[type="number"]:focus  {
+    box-shadow: none;
+    background: #ddd;
+    outline: none;
+}
+
+.shopspark-quick-view-btn {
+    padding: 5px 10px;
+}

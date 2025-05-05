@@ -87,27 +87,29 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 		$alignment_class = '';
 		switch ( $alignment ) {
 			case 'Left':
-				$alignment_class = 'text-left';
+				$alignment_class = 'absolute left-0 text-left';
 				break;
 			case 'Right':
-				$alignment_class = 'text-right';
+				$alignment_class = 'absolute right-0 text-right';
 				break;
 			case 'Center':
 			default:
-				$alignment_class = 'text-center';
+				$alignment_class = 'absolute left-0 right-0 ma-auto text-center';
 				break;
 		}
 
 		printf(
 			'<div class="%s">
-            <button 
-                class="shopspark-quick-view-btn px-3 py-1.5 text-sm rounded-lg" 
+            <button
+                title="%s"
+                class="shopspark-quick-view-btn px-3 py-1.5 text-sm rounded-lg top-0 right-0" 
                 style="background-color: %s; color: #fff;" 
                 data-product-id="%d">
                 %s
             </button>
             </div>',
 			esc_attr( $alignment_class ? $alignment_class : 'text-left' ),
+            esc_attr__( 'Quick View', 'shopspark' ),
 			esc_attr( $color ),
 			esc_attr( $product_id ),
 			esc_html( $text )
@@ -116,15 +118,15 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
 	public function render_quick_view_modal(): void {
 		?>
-		<div id="shopspark-quick-view-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+		<div id="shopspark-quick-view-modal" class="fixed inset-0 bg-black/50 z-999999 hidden flex items-center justify-center">
 
 		<div id="shopspark-toast-container" class="fixed top-5 right-5 space-y-3 z-50"></div>
 
 			<div class="bg-white w-full max-w-3xl rounded-2xl p-6 shadow-xl relative">
-				<button class="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl font-bold"
-					id="shopspark-quick-view-close">
-					&times;
-				</button>
+                <span class="absolute top-0 cursor-pointer right-0 text-red-500 text-lg font-semibold w-[30px] bg-red-500 z-50 text-white text-center"
+                    id="shopspark-quick-view-close">
+                    &times;
+                </span>
 				<div id="shopspark-quick-view-content" class="min-h-[200px] md:flex md:justify-center md:gap-5">
 
 					<!-- Product content will load here -->
@@ -228,7 +230,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 	// Render product info (name, price, etc.)
 	private function render_product_info( $product ) {
 		?>
-		<div class="product-info mt-6 md:mt-0 md:w-1/2">
+        <div class="product-info mt-6 md:mt-0 md:w-1/2 max-h-[500px] overflow-y-auto">
 			<h2 class="text-xl font-bold mb-2"><?php echo esc_html( $product->get_name() ); ?></h2>
 			<div class="text-purple-600 font-semibold mb-4"><?php echo $product->get_price_html(); ?></div>
 			<div class="text-sm text-gray-700 mb-4"><?php echo wpautop( $product->get_short_description() ); ?></div>
@@ -411,35 +413,35 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 		$is_variation = $product->is_type( 'variation' );
 		$is_grouped   = $product->is_type( 'grouped' );
 		?>
-		<div class="quantity-adjuster mb-4">
-			<button 
-				type="button" 
-				class="quantity-btn decrease" 
-				onclick="adjustQuantity('decrease', <?php echo esc_attr( $product->get_id() ); ?>)"
-			>-</button>
-			
-			<input
-				type="number"
-				id="quantity_<?php echo esc_attr( $product->get_id() ); ?>"
-				class="w-24 border border-gray-300 rounded px-3 py-2 text-center"
-				name="quantity"
-				value="1"
-				min="1"
-				<?php if ( ! $is_grouped && ! $is_variation && $product->managing_stock() && $product->get_stock_quantity() > 0 ) : ?>
-					max="<?php echo esc_attr( $product->get_stock_quantity() ); ?>"
-				<?php elseif ( $is_variation ) : ?>
-					max="<?php echo esc_attr( $product->get_variation()->get_stock_quantity() ); ?>"
-				<?php elseif ( $is_grouped ) : ?>
-					max="99" <!-- Adjust as necessary for grouped product -->
-				<?php endif; ?>
-			>
-	
-			<button 
-				type="button" 
-				class="quantity-btn increase" 
-				onclick="adjustQuantity('increase', <?php echo esc_attr( $product->get_id() ); ?>)"
-			>+</button>
-		</div>
+        <div class="quantity-adjuster mb-4 flex items-center space-x-2">
+            <button 
+            type="button" 
+            class="quantity-btn decrease bg-gray-200 text-gray-700 px-3 py-2 rounded-l-full hover:bg-gray-300 transition !important"
+            onclick="adjustQuantity('decrease', <?php echo esc_attr( $product->get_id() ); ?>)"
+            >-</button>
+            
+            <input
+            type="number"
+            id="quantity_<?php echo esc_attr( $product->get_id() ); ?>"
+            class="w-16 text-center py-2 focus:outline-none !important"
+            name="quantity"
+            value="1"
+            min="1"
+            <?php if ( ! $is_grouped && ! $is_variation && $product->managing_stock() && $product->get_stock_quantity() > 0 ) : ?>
+                max="<?php echo esc_attr( $product->get_stock_quantity() ); ?>"
+            <?php elseif ( $is_variation ) : ?>
+                max="<?php echo esc_attr( $product->get_variation()->get_stock_quantity() ); ?>"
+            <?php elseif ( $is_grouped ) : ?>
+                max="99" <!-- Adjust as necessary for grouped product -->
+            <?php endif; ?>
+            >
+        
+            <button 
+            type="button" 
+            class="quantity-btn increase bg-gray-200 text-gray-700 px-3 py-2 rounded-r-full hover:bg-gray-300 transition !important"
+            onclick="adjustQuantity('increase', <?php echo esc_attr( $product->get_id() ); ?>)"
+            >+</button>
+        </div>
 		<?php
 	}
 
@@ -449,7 +451,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 		<div class="product-description mt-6">
 			<h3 class="text-lg font-semibold mb-2"><?php esc_html_e( 'Product Description', 'shopspark' ); ?></h3>
 			<div class="description-text text-sm">
-				<?php echo wpautop( wp_trim_words( $product->get_description(), 20, ' ' ) ); ?>
+				<?php echo wpautop( wp_trim_words( $product->get_description(), 50, ' ' ) ); ?>
 			</div>
 		</div>
 		<?php
@@ -511,66 +513,66 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 								}">
 					<?php settings_fields( 'shopspark_quick_view_settings' ); ?>
 
-					<!-- Quick View Button Text Input -->
-					<?php
-								echo TemplateFunctions::moduleInputField(
-									'shopspark_quick_view_settings[quick_view_text]',
-									__( 'Quick View Button Text', 'shopspark' ),
-									'btnText',
-									'Quick View',
-									'!important',
-									__( 'e.g., Quick View', 'shopspark' ),
-									'',
-									'',
-									true
-								);
+                        <!-- Quick View Button Text Input -->
+                        <?php
+                        echo TemplateFunctions::moduleInputField(
+                            'shopspark_quick_view_settings[quick_view_text]',
+                            __( 'Quick View Button Text', 'shopspark' ),
+                            'btnText',
+                            'Quick View',
+                            '!important',
+                            __( 'e.g., Quick View', 'shopspark' ),
+                            '',
+                            '',
+                            true
+                        );
 
-								// Quick View Modal Size Dropdown
-								echo TemplateFunctions::moduleDropdownField(
-									'shopspark_quick_view_settings[quick_view_modal_size]',
-									__( 'Quick View Modal Size', 'shopspark' ),
-									array( 'small', 'medium', 'large' ),
-									$options['quick_view_modal_size'] ?? 'medium',
-									'modalSize'
-								);
+                        // Quick View Modal Size Dropdown
+                        echo TemplateFunctions::moduleDropdownField(
+                            'shopspark_quick_view_settings[quick_view_modal_size]',
+                            __( 'Quick View Modal Size', 'shopspark' ),
+                            array( 'small', 'medium', 'large' ),
+                            $options['quick_view_modal_size'] ?? 'medium',
+                            'modalSize'
+                        );
 
-							// Quick View Button Position
-								echo TemplateFunctions::moduleDropdownField(
-									'shopspark_quick_view_settings[quick_view_button_position]',
-									__( 'Quick View Button Position', 'shopspark' ),
-									array(
-										'woocommerce_before_shop_loop_item'        => __( 'Before Product Link Start', 'shopspark' ),
-										'woocommerce_before_shop_loop_item_title'  => __( 'Before Product Title', 'shopspark' ),
-										'woocommerce_shop_loop_item_title'         => __( 'Product Title', 'shopspark' ),
-										'woocommerce_after_shop_loop_item_title'   => __( 'After Product Title', 'shopspark' ),
-										'woocommerce_after_shop_loop_item'         => __( 'After Product Link End', 'shopspark' ),
-									),
-									$options['quick_view_button_position'] ?? 'woocommerce_after_shop_loop_item',
-									'buttonPosition'
-								);
+                    // Quick View Button Position
+                        echo TemplateFunctions::moduleDropdownField(
+                            'shopspark_quick_view_settings[quick_view_button_position]',
+                            __( 'Quick View Button Position', 'shopspark' ),
+                            array(
+                                'woocommerce_before_shop_loop_item'        => __( 'Before Product Link Start', 'shopspark' ),
+                                'woocommerce_before_shop_loop_item_title'  => __( 'Before Product Title', 'shopspark' ),
+                                'woocommerce_shop_loop_item_title'         => __( 'Product Title', 'shopspark' ),
+                                'woocommerce_after_shop_loop_item_title'   => __( 'After Product Title', 'shopspark' ),
+                                'woocommerce_after_shop_loop_item'         => __( 'After Product Link End', 'shopspark' ),
+                            ),
+                            $options['quick_view_button_position'] ?? 'woocommerce_after_shop_loop_item',
+                            'buttonPosition'
+                        );
 
-								// Quick View Button Position, Left or Right, center
-								echo TemplateFunctions::moduleDropdownField(
-									'shopspark_quick_view_settings[quick_view_button_alignment]',
-									__( 'Quick View Button Position', 'shopspark' ),
-									array(
-										'left'   => __( 'Left', 'shopspark' ),
-										'right'  => __( 'Right', 'shopspark' ),
-										'center' => __( 'Center', 'shopspark' ),
-									),
-									$options['quick_view_button_alignment'] ?? 'center',
-									'buttonPosition'
-								);
+                        // Quick View Button Position, Left or Right, center
+                        echo TemplateFunctions::moduleDropdownField(
+                            'shopspark_quick_view_settings[quick_view_button_alignment]',
+                            __( 'Quick View Button Position', 'shopspark' ),
+                            array(
+                                'left'   => __( 'Left', 'shopspark' ),
+                                'right'  => __( 'Right', 'shopspark' ),
+                                'center' => __( 'Center', 'shopspark' ),
+                            ),
+                            $options['quick_view_button_alignment'] ?? 'center',
+                            'buttonPosition'
+                        );
 
-								// Quick View Image Size Dropdown
-								echo TemplateFunctions::moduleDropdownField(
-									'shopspark_quick_view_settings[quick_view_image_size]',
-									__( 'Quick View Image Size', 'shopspark' ),
-									array( 'small', 'medium', 'large' ),
-									$options['quick_view_image_size'] ?? 'medium',
-									'imageSize'
-								);
-					?>
+                        // Quick View Image Size Dropdown
+                        echo TemplateFunctions::moduleDropdownField(
+                            'shopspark_quick_view_settings[quick_view_image_size]',
+                            __( 'Quick View Image Size', 'shopspark' ),
+                            array( 'small', 'medium', 'large' ),
+                            $options['quick_view_image_size'] ?? 'medium',
+                            'imageSize'
+                        );
+                        ?>
 
 						<!-- Quick View Button Color -->
 						<div>
@@ -615,7 +617,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
 		if ( wc_get_product( $product_id )->is_type( 'variable' ) ) {
 			if ( ! $variation_id ) {
-				wp_send_json_error( array( 'message' => __( 'No variation selected.', 'shopspark' ) ) );
+				wp_send_json_error( array( 'message' => __( 'No variation selected or This variation isn\'t availe', 'shopspark' ) ) );
 			}
 		}
 
