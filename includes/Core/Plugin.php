@@ -43,7 +43,9 @@ class Plugin {
         $quickView = ! empty( $settings['quick_view'] ) && (int) $settings['quick_view'] === 1;
         $loadMore  = ! empty( $settings['ajax_load_more'] ) && (int) $settings['ajax_load_more'] === 1;
         $quantityButtons = ! empty( $settings['quantity_buttons'] ) && (int) $settings['quantity_buttons'] === 1;
-    
+        $enhanceProductTitle = ! empty( $settings['variation_name_title'] ) && (int) $settings['variation_name_title'] === 1;
+        $tabPopup = ! empty( $settings['product_tabs_popup'] ) && (int) $settings['product_tabs_popup'] === 1;
+
         $providers = array();
     
         if ( $quickView ) {
@@ -56,6 +58,14 @@ class Plugin {
 
         if ( $quantityButtons ) {
             $providers[] = \ShopSpark\Modules\QuatityMinPul\QualityServiceProvider::class;
+        }
+
+        if ( $enhanceProductTitle ) {
+            $providers[] = \ShopSpark\Modules\EnhanceProductTitle\EnhanceProductTitleServiceProvider::class;
+        }
+
+        if ( $tabPopup ) {
+            $providers[] = \ShopSpark\Modules\TabPopup\TabPopupServiceProvider::class;
         }
     
         /**

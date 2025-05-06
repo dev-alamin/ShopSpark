@@ -27,10 +27,11 @@ class Menu {
 		$modules    = apply_filters(
 			'shopspark_admin_settings_tabs',
 			array(
-				'general'    => __( 'General', 'shopspark' ),
-				'quick_view' => __( 'Quick View', 'shopspark' ),
-				'wishlist'   => __( 'Wishlist', 'shopspark' ),
-				'compare'    => __( 'Compare', 'shopspark' ),
+				'general'      => __( 'General', 'shopspark' ),
+				'product_page' => __( 'Product Page', 'shopspark' ),
+				'quick_view'   => __( 'Quick View', 'shopspark' ),
+				'wishlist'     => __( 'Wishlist', 'shopspark' ),
+				'compare'      => __( 'Compare', 'shopspark' ),
 			)
 		);
 		?>
@@ -67,5 +68,7 @@ class Menu {
 		register_setting( 'shopspark_general_settings', 'shopspark_general_settings' );
 		// shopspark_quick_view_settings
 		register_setting( 'shopspark_quick_view_settings', 'shopspark_quick_view_settings' );
+        // shopspark_product_page_settings
+        register_setting( 'shopspark_product_page_settings', 'shopspark_product_page_settings' );
 	}
 }

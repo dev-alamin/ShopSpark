@@ -249,6 +249,73 @@ class TemplateFunctions {
 		return ob_get_clean();
 	}
 
+    public static function moduleCheckboxField(
+        string $name,
+        string $label,
+        bool $checked = false,
+        string $xModel = ''
+    ): string {
+        ob_start(); ?>
+        <div class="flex items-center space-x-3">
+            <input 
+                type="checkbox" 
+                id="<?php echo esc_attr( sanitize_title( $name ) ); ?>" 
+                name="<?php echo esc_attr( $name ); ?>" 
+                value="1"
+                <?php checked( $checked ); ?>
+                <?php echo $xModel ? 'x-model="' . esc_attr( $xModel ) . '"' : ''; ?>
+                class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+            />
+            <label 
+                for="<?php echo esc_attr( sanitize_title( $name ) ); ?>" 
+                class="text-sm font-medium text-gray-700"
+            >
+                <?php echo esc_html( $label ); ?>
+            </label>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+    public static function moduleCheckboxGroup(
+        string $namePrefix,
+        string $label,
+        array $options = [],
+        array $selectedValues = [],
+        string $xModelPrefix = ''
+    ): string {
+        ob_start(); ?>
+    
+        <div class="space-y-2">
+            <p class="text-sm font-medium text-gray-700 mb-1"><?php echo esc_html( $label ); ?></p>
+    
+            <?php foreach ( $options as $value => $text ) : 
+                $fieldId = sanitize_title( $namePrefix . '_' . $value );
+                $isChecked = in_array( $value, $selectedValues, true ); ?>
+                
+                <div class="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        id="<?php echo esc_attr( $fieldId ); ?>"
+                        name="<?php echo esc_attr( $namePrefix ); ?>[]"
+                        value="<?php echo esc_attr( $value ); ?>"
+                        <?php checked( $isChecked ); ?>
+                        <?php echo $xModelPrefix ? 'x-model="' . esc_attr( $xModelPrefix ) . '.' . esc_attr( $value ) . '"' : ''; ?>
+                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label for="<?php echo esc_attr( $fieldId ); ?>" class="text-sm text-gray-700">
+                        <?php echo esc_html( $text ); ?>
+                    </label>
+                </div>
+    
+            <?php endforeach; ?>
+        </div>
+    
+        <?php
+        return ob_get_clean();
+    }
+    
+
 
 	/**
 	 * * ShopSpark Include Templates

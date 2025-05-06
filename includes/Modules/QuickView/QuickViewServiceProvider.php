@@ -2,7 +2,6 @@
 namespace ShopSpark\Modules\QuickView;
 
 use ShopSpark\Core\ServiceProviderInterface;
-use ShopSpark\Modules\QuickView\Admin\Settings;
 use ShopSpark\TemplateFunctions;
 
 class QuickViewServiceProvider implements ServiceProviderInterface {
@@ -459,7 +458,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
 	private function mapHook() {
 		$options  = $this->settings;
-		$position = $options['quick_view_button_position'];
+		$position = $options['quick_view_button_position'] ?? 'woocommerce_after_shop_loop_item';
 		$hook     = '';
 
 		// Map the human-readable value to WooCommerce hooks
