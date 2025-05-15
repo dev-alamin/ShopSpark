@@ -16,7 +16,9 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 	}
 
 	public function register(): void {
-		$hook = $this->mapHook() ? $this->mapHook() : 'woocommerce_after_shop_loop_item';
+        
+		$options = $this->settings;
+        $hook = $options['quick_view_button_position'];
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
@@ -117,7 +119,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 
 	public function render_quick_view_modal(): void {
 		?>
-		<div id="shopspark-quick-view-modal" class="fixed inset-0 bg-black/50 z-999999 hidden flex items-center justify-center">
+		<div id="shopspark-quick-view-modal" class="tailwind-wrapper fixed inset-0 bg-black/50 z-999999 hidden flex items-center justify-center">
 
 		<div id="shopspark-toast-container" class="fixed top-5 right-5 space-y-3 z-50"></div>
 
@@ -455,42 +457,6 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 		</div>
 		<?php
 	}
-
-	private function mapHook() {
-		$options  = $this->settings;
-		$position = $options['quick_view_button_position'] ?? 'woocommerce_after_shop_loop_item';
-		$hook     = '';
-
-		// Map the human-readable value to WooCommerce hooks
-		switch ( $position ) {
-			case 'Before Product Link Start':
-				$hook = 'woocommerce_before_shop_loop_item';
-				break;
-
-			case 'Before Product Title':
-				$hook = 'woocommerce_before_shop_loop_item_title';
-				break;
-
-			case 'Before Product Price':
-				$hook = 'woocommerce_before_shop_loop_item_title';
-				break;
-
-			case 'After Product Title':
-				$hook = 'woocommerce_after_shop_loop_item_title';
-				break;
-
-			case 'After Product Link End':
-				$hook = 'woocommerce_after_shop_loop_item';
-				break;
-
-			default:
-				$hook = 'woocommerce_after_shop_loop_item';
-				break;
-		}
-
-		return $hook;
-	}
-
 
 	public function tab() {
 		$tabs['quick_view'] = __( 'Quick View', 'shopspark' );

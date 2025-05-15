@@ -45,6 +45,7 @@ class Plugin {
         $quantityButtons = ! empty( $settings['quantity_buttons'] ) && (int) $settings['quantity_buttons'] === 1;
         $enhanceProductTitle = ! empty( $settings['variation_name_title'] ) && (int) $settings['variation_name_title'] === 1;
         $tabPopup = ! empty( $settings['product_tabs_popup'] ) && (int) $settings['product_tabs_popup'] === 1;
+        $variationPopup = ! empty( $settings['product_tabs_popup'] ) && (int) $settings['product_tabs_popup'] === 1;
 
         $providers = array();
     
@@ -66,6 +67,10 @@ class Plugin {
 
         if ( $tabPopup ) {
             $providers[] = \ShopSpark\Modules\TabPopup\TabPopupServiceProvider::class;
+        }
+
+        if ( $variationPopup ) {
+            $providers[] = \ShopSpark\Modules\VariationPopup\VariationPopupServerProvider::class;
         }
     
         /**

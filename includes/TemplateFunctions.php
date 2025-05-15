@@ -211,6 +211,7 @@ class TemplateFunctions {
 				'focus:ring-2',
 				'focus:ring-purple-500',
 				'transition',
+                'bg-white'
 			);
 			$buttonClasses = implode( ' ', $buttonClasses );
 			$buttonClasses = self::process_html_class( $buttonClasses );
@@ -322,6 +323,35 @@ class TemplateFunctions {
         <?php
         return ob_get_clean();
     }
+
+    /**
+     * ShopSpark Module Color Picker Field
+     *
+     * @param string $name
+     * @param string $label
+     * @param string $value
+     * @param string $xModel
+     * @return string
+     */
+    public static function moduleColorPickerField(string $name, string $label, string $value = '', string $xModel = ''): string {
+        ob_start();
+        ?>
+        <div class="flex flex-col gap-1">
+            <label for="<?php echo esc_attr($name); ?>" class="font-medium text-gray-700"><?php echo esc_html($label); ?></label>
+            <input 
+                type="color" 
+                name="<?php echo esc_attr($name); ?>" 
+                id="<?php echo esc_attr($name); ?>" 
+                value="<?php echo esc_attr($value); ?>" 
+                <?php echo $xModel ? 'x-model="' . esc_attr($xModel) . '"' : ''; ?>
+                class="w-20 h-10 p-1 border border-gray-300 rounded-lg"
+            />
+        </div>
+        <?php
+        return ob_get_clean();
+    }
+
+
     
 
 

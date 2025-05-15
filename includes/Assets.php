@@ -38,7 +38,7 @@ class Assets {
 		}
 
 		// Tailwind CDN
-		wp_enqueue_style( 'shopspark-tailwind', '//cdn.jsdelivr.net/npm/@tailwindcss/browser@4', array(), '3.4.1' );
+		wp_enqueue_style( 'shopspark-tailwind', '//cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css', array(), '3.4.1' );
 
 		// Tailwind JS
 		wp_enqueue_script( 'shopspark-tailwindjs', '//cdn.jsdelivr.net/npm/@tailwindcss/browser@4' );

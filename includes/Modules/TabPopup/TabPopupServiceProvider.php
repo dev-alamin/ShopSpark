@@ -32,11 +32,10 @@ class TabPopupServiceProvider implements ServiceProviderInterface
 
         $settings = get_option('shopspark_product_page_settings', []);
         $options = $settings['data_tab'] ?? [];
-        $tab_hook  = $options['tab_popup_button_hook'];
-        $buttonPosition = !empty($tab_hook) ? $tab_hook : 'woocommerce_after_single_product_summary';
+        $tab_hook  = $options['tab_popup_button_hook'] ?? 'woocommerce_after_single_product_summary';
         
         // Add the button to the product page
-        add_action($buttonPosition, [$this, 'renderPopupTabs'], 15);
+        add_action($tab_hook, [$this, 'renderPopupTabs'], 15);
 
         // Remove all product tabs
         add_filter( 'woocommerce_product_tabs', [ $this, 'replace_product_tab'] );
@@ -86,10 +85,19 @@ class TabPopupServiceProvider implements ServiceProviderInterface
             $tabs = $this->available_tabs; // Used in the view
         }
 
-        include __DIR__ . '/views/popup-tab.php';
+        $tab_view = __DIR__ . '/views/popup-tab.php';
+        if(  file_exists( $tab_view ) ) {
+            include $tab_view;
+        } else {
+            error_log(sprintf(
+                'Tab view file not found: %s in %s on line %d',
+                $tab_view,
+                __FILE__,
+                __LINE__
+            ));
+        }
     }
 
-    
     /**
      * Enqueue module assets
      *
