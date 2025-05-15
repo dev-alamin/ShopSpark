@@ -181,7 +181,12 @@ class TemplateFunctions {
 
 		<!-- <div x-data="{ open: false, selected: modalSize, options: ['small', 'medium', 'large'] }" class="relative w-full max-w-md mb-6"> -->
 		<div 
-		x-data="{ open: false, selected: '<?php echo $defaultSelected; ?>', options:<?php echo $options; ?> }" 
+        x-data="{ 
+                open: false, 
+                selected: '<?php echo $defaultSelected; ?>', 
+                options: <?php echo $options; ?> 
+            }"
+
 		class="relative w-full max-w-md mb-6 <?php echo esc_attr( $extraClass ); ?>">
 		<label for="<?php echo $dropdownId; ?>" class="block text-sm font-semibold text-gray-800 mb-2">
 				<?php echo $fieldLabel; ?>
@@ -215,7 +220,8 @@ class TemplateFunctions {
 				@click="open = !open"
 				class="<?php echo $buttonClasses; ?>"
 			>
-				<span x-text="selected.charAt(0).toUpperCase() + selected.slice(1)"></span>
+				<span x-text="options[selected]"></span>
+
 				<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
 					viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -234,13 +240,15 @@ class TemplateFunctions {
 				x-transition:leave-end="opacity-0 scale-95"
 				class="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg"
 			>
-				<template x-for="option in options" :key="option">
-					<li @click="selected = option; <?php echo $xModelVar; ?> = option; open = false"
-						:class="{'bg-purple-100': selected === option}"
-						class="px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 cursor-pointer transition"
-						x-text="option.charAt(0).toUpperCase() + option.slice(1)">
-					</li>
-				</template>
+				<template x-for="[key, label] in Object.entries(options)" :key="key">
+                    <li 
+                        @click="selected = key; <?php echo $xModelVar; ?> = key; open = false"
+                        :class="{'bg-purple-100': selected === key}"
+                        class="px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 cursor-pointer transition"
+                        x-text="label"
+                    ></li>
+                </template>
+
 			</ul>
 
 			<input type="hidden" id="<?php echo $dropdownId; ?>" name="<?php echo $fieldKey; ?>" :value="selected" />

@@ -44,7 +44,7 @@ class Assets {
 		wp_enqueue_script( 'shopspark-tailwindjs', '//cdn.jsdelivr.net/npm/@tailwindcss/browser@4' );
 
 		// Alpine JS CDN
-        wp_enqueue_script( 'shopspark-alpine' );
+        wp_register_script( 'shopspark-alpine', SHOP_SPARK_PLUGIN_ASSETS_URL . 'js/alpine.min.js', array(), '3.0.0', true );
 
 		// wp_enqueue_script( 'shopspark-alpine', '//cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', array(), '3.0.0', true );
 
@@ -57,6 +57,6 @@ class Assets {
         wp_enqueue_style( 'shopspark-frontend-css', plugins_url( 'assets/css/frontend.css', $this->plugin_file ), array(), '1.0.0' );
         wp_enqueue_script( 'shopspark-frontend-js', plugins_url( 'assets/js/frontend.js', $this->plugin_file ), array( 'jquery' ), '1.0.0', true );
 
-        wp_register_script( 'shopspark-alpine', '//cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', array(), '3.0.0', true );
+        wp_register_script( 'shopspark-alpine', SHOP_SPARK_PLUGIN_ASSETS_URL . 'js/alpine.min.js', array(), '3.0.0', true );
     }
 }
