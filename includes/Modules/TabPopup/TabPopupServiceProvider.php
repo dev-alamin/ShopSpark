@@ -26,12 +26,13 @@ class TabPopupServiceProvider implements ServiceProviderInterface
     public function register(): void
     {
 
-        add_action( 'shopspark_admin_settings_panel_product_page', array( $this, 'settings' ) );
+        add_action( 'shopspark_admin_product_page_panel_data_tab', array( $this, 'settings' ) );
 
         add_action('wp_enqueue_scripts', [$this, 'enqueueAssets']);
 
         $settings = get_option('shopspark_product_page_settings', []);
-        $tab_hook  = $settings['tab_popup_button_hook'];
+        $options = $settings['data_tab'] ?? [];
+        $tab_hook  = $options['tab_popup_button_hook'];
         $buttonPosition = !empty($tab_hook) ? $tab_hook : 'woocommerce_after_single_product_summary';
         
         // Add the button to the product page
@@ -127,31 +128,32 @@ class TabPopupServiceProvider implements ServiceProviderInterface
      */
     public function settings(): void
     {
-        $options = $this->settings;
+        $options = $this->settings['data_tab'] ?? [];
+
         ?>
         <div class="max-w-5xl mx-auto">
             <h2 class="!text-3xl !font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2">
-                <?php _e( 'Single Product Page Settings', 'shopspark' ); ?>
+                <?php _e( 'Product Page – Data Tab Settings', 'shopspark' ); ?>
             </h2>
-            <form method="post" action="options.php" class="space-y-6" x-data="{ 
-                                btnText: '<?php echo esc_js( $options['quick_view_text'] ?? 'Quick View' ); ?>', 
-                                tabPopupHook: '<?php echo esc_js( $options['tab_popup_button_hook'] ?? 'medium' ); ?>',
-                                tabPopupAlign: '<?php echo esc_js( $options['tab_popup_button_alignment'] ?? 'medium' ); ?>',
-                                buttonColor: '<?php echo esc_js( $options['quick_view_button_color'] ?? '#3b82f6' ); ?>'
-                            }">
+            <form method="post" action="options.php" class="space-y-6" 
+                x-data="{ 
+                        btnText: '<?php echo esc_js( $options['quick_view_text'] ?? 'Quick View' ); ?>', 
+                        tabPopupHook: '<?php echo esc_js( $options['tab_popup_button_hook'] ?? 'medium' ); ?>',
+                        tabPopupAlign: '<?php echo esc_js( $options['tab_popup_button_alignment'] ?? 'medium' ); ?>',
+                        buttonColor: '<?php echo esc_js( $options['quick_view_button_color'] ?? '#3b82f6' ); ?>'
+                }">
+                
                 <?php settings_fields( 'shopspark_product_page_settings' ); ?>
 
                 <?php
-                    // Enable Popup Tabs
                     echo TemplateFunctions::moduleCheckboxField(
-                        'shopspark_product_page_settings[enable_tab_popups]',
+                        'shopspark_product_page_settings[data_tab][enable_tab_popups]',
                         __( 'Enable Product Data Tabs as Popup/Side Panel', 'shopspark' ),
                         $options['enable_tab_popups'] ?? false
                     );
 
-                    // Popup Button Hook Position (same hook dropdown, reused)
                     echo TemplateFunctions::moduleDropdownField(
-                        'shopspark_product_page_settings[tab_popup_button_hook]',
+                        'shopspark_product_page_settings[data_tab][tab_popup_button_hook]',
                         __( 'Tab Popup Button Hook Position', 'shopspark' ),
                         array(
                             'woocommerce_before_single_product_summary' => __( 'Before Summary', 'shopspark' ),
@@ -177,9 +179,8 @@ class TabPopupServiceProvider implements ServiceProviderInterface
                         'tabPopupHook'
                     );
 
-                    // Button Alignment
                     echo TemplateFunctions::moduleDropdownField(
-                        'shopspark_product_page_settings[tab_popup_button_alignment]',
+                        'shopspark_product_page_settings[data_tab][tab_popup_button_alignment]',
                         __( 'Tab Popup Button Alignment', 'shopspark' ),
                         array(
                             'left'   => __( 'Left', 'shopspark' ),
@@ -190,9 +191,8 @@ class TabPopupServiceProvider implements ServiceProviderInterface
                         'tabPopupAlign'
                     );
 
-                    // Select Tabs to Show as Popups (Checkbox group)
                     echo TemplateFunctions::moduleCheckboxGroup(
-                        'shopspark_product_page_settings[tab_popup_tabs]',
+                        'shopspark_product_page_settings[data_tab][tab_popup_tabs]',
                         __( 'Tabs to Show as Popups', 'shopspark' ),
                         array(
                             'description'       => __( 'Description', 'shopspark' ),
@@ -201,15 +201,12 @@ class TabPopupServiceProvider implements ServiceProviderInterface
                         ),
                         $options['tab_popup_tabs'] ?? ['description', 'additional_info', 'reviews']
                     );
-                    ?>
+                ?>
 
-
-                <!-- Save Button -->
                 <?php echo TemplateFunctions::saveButton(); ?>
 
             </form>
         </div>
         <?php
     }
-    
 }

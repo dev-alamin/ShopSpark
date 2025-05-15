@@ -59,9 +59,25 @@ class Menu {
                     $nested_tabs = apply_filters(
                         'shopspark_admin_product_page_nested_tabs',
                         array(
-                            'general_info' => __( 'General Info', 'shopspark' ),
-                            'advanced'     => __( 'Advanced Settings', 'shopspark' ),
-                            'styles'       => __( 'Styles', 'shopspark' ),
+                            'data_tab'             => __( 'Tabs', 'shopspark' ),
+                            'variation_popup'      => __( 'Variation popup', 'shopspark' ),
+                            'qty_plus_minus'       => __( 'Qty +/-', 'shopspark' ),
+                            'variation_name_title' => __( 'Variation in title', 'shopspark' ),
+                            'variation_individual' => __( 'Each variation', 'shopspark' ),
+                            'product_data_popup'   => __( 'Details popup', 'shopspark' ),
+                            'other_variations'     => __( 'More options', 'shopspark' ),
+                            'desc_read_more'       => __( 'Read More', 'shopspark' ),
+                            'notify_me'            => __( 'Notify me', 'shopspark' ),
+                            'ask_question'         => __( 'Ask', 'shopspark' ),
+                            'size_guide'           => __( 'Size guide', 'shopspark' ),
+                            'better_gallery'       => __( 'Gallery', 'shopspark' ),
+                            'already_in_cart'      => __( 'In cart', 'shopspark' ),
+                            'custom_data_tab'      => __( 'Extra tabs', 'shopspark' ),
+                            'users_want_this'      => __( 'Wishlist count', 'shopspark' ),
+                            'share_product'        => __( 'Share', 'shopspark' ),
+                            'stock_quantity'       => __( 'Stock', 'shopspark' ),
+                            'countdown_fomo'       => __( 'Countdown', 'shopspark' ),
+                            'styles'               => __( 'Styles', 'shopspark' ),
                         )
                     );
 
@@ -70,7 +86,7 @@ class Menu {
                     ?>
 
                     <div x-data="{ nestedTab: '<?php echo esc_attr( $active_nested_tab ); ?>' }" class="mb-6">
-                        <nav class="flex space-x-4 border-b border-gray-300 mb-4">
+                        <nav class="flex space-x-4 border-b border-gray-300 mb-4 flex-wrap">
                             <?php foreach ( $nested_tabs as $subkey => $sublabel ) : ?>
                                 <button
                                     @click.prevent="nestedTab = '<?php echo esc_attr( $subkey ); ?>'"

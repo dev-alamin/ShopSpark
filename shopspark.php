@@ -49,15 +49,3 @@ function shopspark_bootstrap() {
     $plugin->init();
 }
 add_action('plugins_loaded', 'shopspark_bootstrap');
-
-add_action( 'shopspark_admin_product_page_panel_general_info', function() {
-    echo '<p>General Info content goes here.</p>';
-});
-
-add_action( 'shopspark_admin_product_page_panel_advanced', function() {
-    echo '<p>Advanced product page settings here.</p>';
-});
-
-add_action( 'shopspark_admin_product_page_panel_styles', function() {
-    echo '<p>Styles tab content here.</p>';
-});
