@@ -131,6 +131,15 @@ class Menu {
 		// shopspark_quick_view_settings
 		register_setting( 'shopspark_quick_view_settings', 'shopspark_quick_view_settings' );
         // shopspark_product_page_settings
-        register_setting( 'shopspark_product_page_settings', 'shopspark_product_page_settings' );
+        register_setting( 'shopspark_product_page_tab_popup', 'shopspark_product_page_tab_popup' );
+        register_setting( 'shopspark_product_page_variation_popup', 'shopspark_product_page_variation_popup' );
+        register_setting( 'shopspark_product_page_qty_plus_minus', 'shopspark_product_page_qty_plus_minus' );
+        register_setting( 'shopspark_product_page_variation_name_title', 'shopspark_product_page_variation_name_title' );
+        register_setting( 'shopspark_product_page_variation_individual', 'shopspark_product_page_variation_individual' );
+        register_setting( 'shopspark_product_page_product_data_popup', 'shopspark_product_page_product_data_popup' );
+        register_setting( 'shopspark_product_page_other_variations', 'shopspark_product_page_other_variations' );
+        register_setting( 'shopspark_product_page_desc_read_more', 'shopspark_product_page_desc_read_more' );
+        register_setting( 'shopspark_product_page_notify_me', 'shopspark_product_page_notify_me' );
+        register_setting( 'shopspark_product_page_ask_question', 'shopspark_product_page_ask_question' );
 	}
 }

@@ -92,31 +92,32 @@ class GeneralTab {
 		<?php settings_fields( 'shopspark_general_settings' ); ?>
 
 		<?php foreach ( $grouped as $section => $keys ) : ?>
-		<div>
-			<h2 class="!text-3xl !font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2">
-				<?php echo esc_html( $section ); ?>
-			</h2>
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-				<?php foreach ( $keys as $key ) : ?>
-				<div class="flex items-center justify-between bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
-					<span class="text-gray-800 font-medium"><?php echo esc_html( $modules[ $key ] ); ?></span>
-					<label class="relative inline-flex items-center cursor-pointer">
-						<!-- Hidden input for saving the checkbox value -->
-						<input type="hidden" name="shopspark_general_settings[<?php echo esc_attr( $key ); ?>]"
-							:value="modules['<?php echo esc_attr( $key ); ?>'] ? 1 : 0" />
-						<input type="checkbox" class="sr-only peer" x-model="modules['<?php echo esc_attr( $key ); ?>']"
-							:checked="modules['<?php echo esc_attr( $key ); ?>']"
-							<?php checked( ! empty( $settings[ $key ] ), true ); ?> />
-						<div
-							class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer transition-all peer-checked:bg-blue-600">
-						</div>
-						<div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all"
-							:class="modules['<?php echo esc_attr( $key ); ?>'] ? 'translate-x-5' : 'translate-x-0'"></div>
-					</label>
-				</div>
-				<?php endforeach; ?>
-			</div>
-		</div>
+        <div>
+            <h2 class="!text-3xl !font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2">
+                <?php echo esc_html( $section ); ?>
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <?php foreach ( $keys as $key ) : ?>
+                <div class="flex items-center justify-between bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                    <span class="text-gray-800 font-medium"><?php echo esc_html( $modules[ $key ] ); ?></span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <!-- Hidden input for saving the checkbox value -->
+                        <input type="hidden" name="shopspark_general_settings[<?php echo esc_attr( $key ); ?>]"
+                            :value="modules['<?php echo esc_attr( $key ); ?>'] ? 1 : 0" />
+                        <input type="checkbox" class="sr-only peer" x-model="modules['<?php echo esc_attr( $key ); ?>']"
+                            :checked="modules['<?php echo esc_attr( $key ); ?>']"
+                            <?php checked( ! empty( $settings[ $key ] ), true ); ?> />
+                        <div
+                            class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer transition-all"
+                            :class="modules['<?php echo esc_attr( $key ); ?>'] ? 'bg-blue-600' : 'bg-gray-300'">
+                        </div>
+                        <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all"
+                            :class="modules['<?php echo esc_attr( $key ); ?>'] ? 'translate-x-5 border-blue-600' : 'translate-x-0 border-gray-300'"></div>
+                    </label>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
 		<?php endforeach; ?>
 
 		<div class="text-right pt-6">

@@ -12,10 +12,12 @@ class TabPopupServiceProvider implements ServiceProviderInterface
 {
     protected array $settings;
     protected $available_tabs = [];
+    protected string $settings_field;
 
     public function __construct()
     {
-        $this->settings = get_option('shopspark_product_page_settings', []);
+        $this->settings = get_option('shopspark_product_page_tab_popup', []);
+        $this->settings_field = 'shopspark_product_page_tab_popup';
     }
 
     /**
@@ -30,8 +32,9 @@ class TabPopupServiceProvider implements ServiceProviderInterface
 
         add_action('wp_enqueue_scripts', [$this, 'enqueueAssets']);
 
-        $settings = get_option('shopspark_product_page_settings', []);
-        $options = $settings['data_tab'] ?? [];
+        $settings = get_option('shopspark_product_page_tab_popup', []);
+        $options = $settings ?? [];
+
         $tab_hook  = $options['tab_popup_button_hook'] ?? 'woocommerce_after_single_product_summary';
         
         // Add the button to the product page
@@ -136,7 +139,7 @@ class TabPopupServiceProvider implements ServiceProviderInterface
      */
     public function settings(): void
     {
-        $options = $this->settings['data_tab'] ?? [];
+        $options = $this->settings ?? [];
 
         ?>
         <div class="max-w-5xl mx-auto">
@@ -151,17 +154,17 @@ class TabPopupServiceProvider implements ServiceProviderInterface
                         buttonColor: '<?php echo esc_js( $options['quick_view_button_color'] ?? '#3b82f6' ); ?>'
                 }">
                 
-                <?php settings_fields( 'shopspark_product_page_settings' ); ?>
+                <?php settings_fields( $this->settings_field ); ?>
 
                 <?php
                     echo TemplateFunctions::moduleCheckboxField(
-                        'shopspark_product_page_settings[data_tab][enable_tab_popups]',
+                        $this->settings_field . '[enable_tab_popups]',
                         __( 'Enable Product Data Tabs as Popup/Side Panel', 'shopspark' ),
                         $options['enable_tab_popups'] ?? false
                     );
 
                     echo TemplateFunctions::moduleDropdownField(
-                        'shopspark_product_page_settings[data_tab][tab_popup_button_hook]',
+                        $this->settings_field . '[tab_popup_button_hook]',
                         __( 'Tab Popup Button Hook Position', 'shopspark' ),
                         array(
                             'woocommerce_before_single_product_summary' => __( 'Before Summary', 'shopspark' ),
@@ -188,7 +191,7 @@ class TabPopupServiceProvider implements ServiceProviderInterface
                     );
 
                     echo TemplateFunctions::moduleDropdownField(
-                        'shopspark_product_page_settings[data_tab][tab_popup_button_alignment]',
+                        $this->settings_field . '[tab_popup_button_alignment]',
                         __( 'Tab Popup Button Alignment', 'shopspark' ),
                         array(
                             'left'   => __( 'Left', 'shopspark' ),
@@ -200,7 +203,7 @@ class TabPopupServiceProvider implements ServiceProviderInterface
                     );
 
                     echo TemplateFunctions::moduleCheckboxGroup(
-                        'shopspark_product_page_settings[data_tab][tab_popup_tabs]',
+                        $this->settings_field . '[tab_popup_tabs]',
                         __( 'Tabs to Show as Popups', 'shopspark' ),
                         array(
                             'description'       => __( 'Description', 'shopspark' ),

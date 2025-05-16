@@ -3,73 +3,89 @@ document.addEventListener('DOMContentLoaded', function () {
     const variationList = document.querySelector('.shopspark-variation-list');
     const wcSelects = document.querySelectorAll('.single-product div.product table.variations select');
 
-    if (!variationContainer || !variationList || wcSelects.length === 0) return 'No variation container or list found';
+    if (!variationContainer || !variationList || wcSelects.length === 0) return;
 
     let activeSelect = null;
+    let overlay = null;
+    let justOpened = false;
 
     wcSelects.forEach(select => {
-        select.addEventListener('mousedown', function (e) {
-            e.preventDefault(); // prevent native dropdown
+        // Prevent default dropdown behavior
+        select.addEventListener('mousedown', e => e.preventDefault());
 
-            activeSelect = this; // track which select was clicked
+        select.addEventListener('click', function (e) {
+            e.preventDefault();
 
-            variationList.innerHTML = ''; // clear old items
+            if (overlay) overlay.remove(); // clean previous overlay
+            overlay = document.createElement('div');
+            overlay.className = 'shopspark-overlay';
+            Object.assign(overlay.style, {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                zIndex: '9999',
+                backdropFilter: 'blur(5px)',
+            });
 
-            // Loop through options and create custom list items
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
+
+            overlay.addEventListener('click', closePopup);
+
+            activeSelect = this;
+            variationList.innerHTML = '';
+
             Array.from(this.options).forEach(option => {
-                if (!option.value) return; // skip placeholder
+                if (!option.value) return;
 
                 const li = document.createElement('li');
                 li.textContent = option.text;
                 li.dataset.value = option.value;
-
-                li.classList.add(
-                    'shopspark-option-item',
-                    'cursor-pointer',
-                    'bg-gray-100',
-                    'hover:bg-blue-500',
-                    'hover:text-white',
-                    'px-4',
-                    'py-2',
-                    'rounded',
-                    'transition',
-                    'duration-200',
-                    'ease-in-out',
-                    'text-sm',
-                    'list-none',
-                );
-
+                li.className = 'shopspark-option-item cursor-pointer bg-gray-100 hover:bg-blue-500 hover:text-white px-4 py-2 rounded transition duration-200 ease-in-out text-sm list-none';
                 variationList.appendChild(li);
             });
 
-
             variationContainer.classList.remove('hidden');
+            justOpened = true;
+            setTimeout(() => (justOpened = false), 100);
         });
     });
 
-    // When user clicks on a custom <li>
+    // Handle user click on variation option
     variationList.addEventListener('click', function (e) {
         if (e.target.tagName !== 'LI' || !activeSelect) return;
 
         const selectedValue = e.target.dataset.value;
-
-        // Set the selected option in the correct select
         activeSelect.value = selectedValue;
-
-        // Trigger change event so WooCommerce can react
         activeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-
-        // Hide the custom popup
-        variationContainer.classList.add('hidden');
-
-        activeSelect = null;
+        closePopup();
     });
 
-    // Optional: close popup if clicked outside
+    // Close if clicked outside
     document.addEventListener('click', function (e) {
-        if (!variationContainer.contains(e.target) && !Array.from(wcSelects).includes(e.target)) {
-            variationContainer.classList.add('hidden');
-            activeSelect = null;
+        if (justOpened) return;
+        if (
+            overlay &&
+            !variationContainer.contains(e.target) &&
+            !Array.from(wcSelects).includes(e.target)
+        ) {
+            closePopup();
         }
     });
+
+    function closePopup() {
+        variationContainer.classList.add('hidden');
+        if (overlay) overlay.remove();
+        overlay = null;
+        activeSelect = null;
+        document.body.style.overflow = 'auto';
+    }
+
+    variationContainer.querySelector('button').addEventListener('click', function () {
+        closePopup();
+    }
+    );
 });
