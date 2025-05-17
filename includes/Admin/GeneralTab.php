@@ -18,6 +18,7 @@ class GeneralTab {
 				'grid_list_toggle'        => __( 'Grid/List Toggle', 'shopspark' ),
 
 				// Single Product Page
+                'variation_popup'         => __( 'Variation Popup', 'shopspark' ),
 				'quantity_buttons'        => __( 'Quantity plus/minus buttons', 'shopspark' ),
 				'variation_name_title'    => __( 'Variation name with title', 'shopspark' ),
 				'description_toggle'      => __( 'Description with “Read More” toggle + shadow', 'shopspark' ),
@@ -52,6 +53,7 @@ class GeneralTab {
 			),
 			'Single Product Page' => array(
 				'quantity_buttons',
+                'variation_popup',
 				'variation_name_title',
 				'description_toggle',
 				'size_guide_popup',

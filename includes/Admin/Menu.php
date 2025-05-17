@@ -1,8 +1,9 @@
 <?php
 namespace ShopSpark\Admin;
 
+use PHP_CodeSniffer\Util\Help;
 use ShopSpark\Admin\GeneralTab;
-
+use ShopSpark\Admin\Helper;
 class Menu {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
@@ -27,11 +28,12 @@ class Menu {
         $modules    = apply_filters(
             'shopspark_admin_settings_tabs',
             array(
-                'general'      => __( 'General', 'shopspark' ),
-                'product_page' => __( 'Product Page', 'shopspark' ),
-                'quick_view'   => __( 'Quick View', 'shopspark' ),
-                'wishlist'     => __( 'Wishlist', 'shopspark' ),
-                'compare'      => __( 'Compare', 'shopspark' ),
+                'general'       => __( 'General', 'shopspark' ),
+                'product_page'  => __( 'Product Page', 'shopspark' ),
+                'shop_page'     => __( 'Shop Page', 'shopspark' ),
+                'cart_page'     => __( 'Cart Page', 'shopspark' ),
+                'checkout_page' => __( 'Checkout Page', 'shopspark' ),
+                'security'      => __( 'Performance & Security', 'shopspark' ),
             )
         );
         ?>
@@ -53,13 +55,25 @@ class Menu {
             <div class="bg-gradient-to-r from-indigo-50 via-purple-100 to-pink-50 p-6 rounded-lg">
 
                 <?php
-                // If the active tab is 'product_page', show nested tabs
-                if ( 'product_page' === $active_tab ) {
+                if ( 'shop_page' === $active_tab ) {
+                $nested_tabs = apply_filters(
+                    'shopspark_admin_shop_page_nested_tabs',
+                    [
+                        'quick_view' => __( 'Quick View', 'shopspark' ),
+                        'pagination' => __( 'Pagination', 'shopspark' ),
+                    ]
+                );
+
+
+                Helper::render_nested_tabs('admin_shop_page', $nested_tabs);
+            }
+            elseif( 'product_page' === $active_tab ) {
                     // Get nested tabs via filter, fallback to example tabs
                     $nested_tabs = apply_filters(
                         'shopspark_admin_product_page_nested_tabs',
                         array(
                             'data_tab'             => __( 'Tabs', 'shopspark' ),
+                            'ajax_add_to_cart' => __( 'Add To Cart', 'shopspark' ),
                             'variation_popup'      => __( 'Variation popup', 'shopspark' ),
                             'qty_plus_minus'       => __( 'Qty +/-', 'shopspark' ),
                             'variation_name_title' => __( 'Variation in title', 'shopspark' ),
@@ -81,39 +95,9 @@ class Menu {
                         )
                     );
 
-                    // Pick nested tab from query var or default
-                    $active_nested_tab = isset( $_GET['subtab'] ) ? sanitize_text_field( $_GET['subtab'] ) : key($nested_tabs);
-                    ?>
-
-                    <div x-data="{ nestedTab: '<?php echo esc_attr( $active_nested_tab ); ?>' }" class="mb-6">
-                        <nav class="flex space-x-4 border-b border-gray-300 mb-4 flex-wrap">
-                            <?php foreach ( $nested_tabs as $subkey => $sublabel ) : ?>
-                                <button
-                                    @click.prevent="nestedTab = '<?php echo esc_attr( $subkey ); ?>'"
-                                    :class="nestedTab === '<?php echo esc_attr( $subkey ); ?>' ? 'border-b-2 border-blue-600 text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'"
-                                    class="pb-2 px-3"
-                                >
-                                    <?php echo esc_html( $sublabel ); ?>
-                                </button>
-                            <?php endforeach; ?>
-                        </nav>
-
-                        <div>
-                            <?php
-                            // Render nested tab content via hook to allow modular extension
-                            foreach ( $nested_tabs as $subkey => $sublabel ) {
-                                ?>
-                                <div x-show="nestedTab === '<?php echo esc_attr( $subkey ); ?>'" x-cloak>
-                                    <?php do_action( "shopspark_admin_product_page_panel_{$subkey}" ); ?>
-                                </div>
-                                <?php
-                            }
-                            ?>
-                        </div>
-                    </div>
-
-                <?php
-                } else {
+                    Helper::render_nested_tabs('admin_product_page', $nested_tabs);
+                }
+                else {
                     // Default: load tab content for other main tabs
                     do_action( "shopspark_admin_settings_panel_{$active_tab}" );
                 }

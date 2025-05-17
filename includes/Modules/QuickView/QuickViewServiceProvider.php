@@ -12,7 +12,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 		$this->settings = get_option( 'shopspark_quick_view_settings', array() );
 
 		// add_filter( 'shopspark_admin_settings_tabs', [ $this, 'tab' ] );
-		add_action( 'shopspark_admin_settings_panel_quick_view', array( $this, 'settings' ) );
+		add_action( 'shopspark_admin_shop_page_panel_quick_view', array( $this, 'settings' ) );
 	}
 
 	public function register(): void {

@@ -40,12 +40,12 @@ class Plugin {
         $settings = is_array( $settings ) ? $settings : array();
     
         // Safely read module flags
-        $quickView = ! empty( $settings['quick_view'] ) && (int) $settings['quick_view'] === 1;
-        $loadMore  = ! empty( $settings['ajax_load_more'] ) && (int) $settings['ajax_load_more'] === 1;
-        $quantityButtons = ! empty( $settings['quantity_buttons'] ) && (int) $settings['quantity_buttons'] === 1;
-        $enhanceProductTitle = ! empty( $settings['variation_name_title'] ) && (int) $settings['variation_name_title'] === 1;
-        $tabPopup = ! empty( $settings['product_tabs_popup'] ) && (int) $settings['product_tabs_popup'] === 1;
-        $variationPopup = ! empty( $settings['product_tabs_popup'] ) && (int) $settings['product_tabs_popup'] === 1;
+        $quickView           = ! empty( $settings['quick_view'] )            && (int) $settings['quick_view']            === 1;
+        $loadMore            = ! empty( $settings['ajax_load_more'] )        && (int) $settings['ajax_load_more']        === 1;
+        $quantityButtons     = ! empty( $settings['quantity_buttons'] )      && (int) $settings['quantity_buttons']      === 1;
+        $enhanceProductTitle = ! empty( $settings['variation_name_title'] )  && (int) $settings['variation_name_title']  === 1;
+        $tabPopup            = ! empty( $settings['product_tabs_popup'] )    && (int) $settings['product_tabs_popup']    === 1;
+        $variationPopup      = ! empty( $settings['variation_popup'] )       && (int) $settings['variation_popup']       === 1;
 
         $providers = array();
     
@@ -72,7 +72,9 @@ class Plugin {
         if ( $variationPopup ) {
             $providers[] = \ShopSpark\Modules\VariationPopup\VariationPopupServerProvider::class;
         }
-    
+
+        $providers[] = \ShopSpark\Modules\AjaxAddToCart\AjaxAddToCartServerProvider::class;
+
         /**
          * Allow filtering the enabled modules for future extensibility.
          *
@@ -91,6 +93,11 @@ class Plugin {
         }
     }    
 
+    /**
+     * Load plugin textdomain
+     *
+     * @return void
+     */
 	protected function load_textdomain(): void {
 		load_plugin_textdomain(
 			'shopspark',
@@ -99,6 +106,12 @@ class Plugin {
 		);
 	}
 
+    /**
+     * Register modules
+     *
+     * @param array $providers The list of service provider classes to load.
+     * @return mixed
+     */
 	protected function register_modules( array $providers ): void {
 		foreach ( $providers as $provider ) {
 			if ( class_exists( $provider ) ) {
