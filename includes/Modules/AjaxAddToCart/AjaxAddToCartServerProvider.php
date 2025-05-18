@@ -193,25 +193,6 @@ class AjaxAddToCartServerProvider implements ServiceProviderInterface
     // Handle simple or variable products
     $cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, $variation_id);
 
-    // For simple or variable products
-    if ($variation_id > 0) {
-        $product_to_check = wc_get_product($variation_id);
-    } else {
-        $product_to_check = $product;
-    }
-
-    if ($product_to_check && !$product_to_check->is_in_stock()) {
-        wp_send_json_error(['message' => __('This product is out of stock.', 'shopspark')]);
-        wp_die();
-    }
-
-    if ($product_to_check && !$product_to_check->has_enough_stock($quantity)) {
-        wp_send_json_error(['message' => sprintf(__('Only %d items left in stock.', 'shopspark'), $product_to_check->get_stock_quantity())]);
-        wp_die();
-    }
-
-    $cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, $variation_id);
-
     if ($cart_item_key) {
         $message = sprintf(
             __('"%s" has been added to your cart.', 'shopspark'),
@@ -230,7 +211,6 @@ class AjaxAddToCartServerProvider implements ServiceProviderInterface
     } else {
         wp_send_json_error(['message' => __('Failed to add product to cart', 'shopspark')]);
     }
-
 
     wp_die();
 }

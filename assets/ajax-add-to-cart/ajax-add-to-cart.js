@@ -24,8 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const productIdInput = container.querySelector('input[name="add-to-cart"], input[name="product_id"], button[name="add-to-cart"]');
     const productId = productIdInput ? productIdInput.value : null;
 
-    console.log('Product ID:', container);
-
     // Variation ID (if any)
     const variationIdInput = container.querySelector('input.variation_id');
     const variationId = variationIdInput ? variationIdInput.value : 0;
@@ -94,9 +92,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (noticesWrapper) {
                 noticesWrapper.innerHTML = data.data.notice;
             }
-            console.log('Product added to cart:', data);
+            //console.log('Product added to cart:', data);
         } else {
-            console.error('Error adding to cart:', data.data?.message || data.message);
+            //console.error('Error adding to cart:', data.data?.message || data.message);
             alert(data.data?.message || data.message || 'Failed to add product to cart');
         }
     })
@@ -108,26 +106,5 @@ document.addEventListener('DOMContentLoaded', function () {
         this.disabled = false;
     });
 });
-
-
-
-    function getGroupedProductQuantities() {
-        const quantities = {};
-        
-        // Select all inputs named quantity[child_id]
-        document.querySelectorAll('input[name^="quantity["]').forEach(input => {
-            const name = input.getAttribute('name');  // e.g. "quantity[68]"
-            const match = name.match(/quantity\[(\d+)\]/);
-            if (match) {
-            const productId = match[1];
-            const qty = parseInt(input.value, 10) || 0;
-            if (qty > 0) {
-                quantities[productId] = qty;
-            }
-            }
-        });
-
-        return quantities;
-    }
 
 });
