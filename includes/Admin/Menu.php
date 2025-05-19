@@ -74,6 +74,7 @@ class Menu {
                         array(
                             'data_tab'             => __( 'Tabs', 'shopspark' ),
                             'ajax_add_to_cart' => __( 'Add To Cart', 'shopspark' ),
+                            'buy_now_button'       => __( 'Buy Now', 'shopspark' ),
                             'variation_popup'      => __( 'Variation popup', 'shopspark' ),
                             'qty_plus_minus'       => __( 'Qty +/-', 'shopspark' ),
                             'variation_name_title' => __( 'Variation in title', 'shopspark' ),
@@ -125,5 +126,6 @@ class Menu {
         register_setting( 'shopspark_product_page_desc_read_more', 'shopspark_product_page_desc_read_more' );
         register_setting( 'shopspark_product_page_notify_me', 'shopspark_product_page_notify_me' );
         register_setting( 'shopspark_product_page_ask_question', 'shopspark_product_page_ask_question' );
+        register_setting( 'shopspark_product_page_buy_now_button', 'shopspark_product_page_buy_now_button' );
 	}
 }

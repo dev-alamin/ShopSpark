@@ -2,6 +2,7 @@
 namespace ShopSpark\Modules\TabPopup;
 use ShopSpark\Core\ServiceProviderInterface;
 use ShopSpark\TemplateFunctions;
+use ShopSpark\Traits\HelperTrait;
 
 /**
  * Class TabPopupServiceProvider
@@ -10,6 +11,7 @@ use ShopSpark\TemplateFunctions;
  */
 class TabPopupServiceProvider implements ServiceProviderInterface
 {
+    use HelperTrait;
     protected array $settings;
     protected $available_tabs = [];
     protected string $settings_field;
@@ -149,7 +151,7 @@ class TabPopupServiceProvider implements ServiceProviderInterface
             <form method="post" action="options.php" class="space-y-6" 
                 x-data="{ 
                         btnText: '<?php echo esc_js( $options['quick_view_text'] ?? 'Quick View' ); ?>', 
-                        tabPopupHook: '<?php echo esc_js( $options['tab_popup_button_hook'] ?? 'medium' ); ?>',
+                        tabPopupHook: '<?php echo esc_js( $options['tab_popup_button_hook'] ?? 'woocommerce_after_single_product_summary' ); ?>',
                         tabPopupAlign: '<?php echo esc_js( $options['tab_popup_button_alignment'] ?? 'medium' ); ?>',
                         buttonColor: '<?php echo esc_js( $options['quick_view_button_color'] ?? '#3b82f6' ); ?>'
                 }">
@@ -166,26 +168,7 @@ class TabPopupServiceProvider implements ServiceProviderInterface
                     echo TemplateFunctions::moduleDropdownField(
                         $this->settings_field . '[tab_popup_button_hook]',
                         __( 'Tab Popup Button Hook Position', 'shopspark' ),
-                        array(
-                            'woocommerce_before_single_product_summary' => __( 'Before Summary', 'shopspark' ),
-                            'woocommerce_single_product_summary'        => __( 'In Summary', 'shopspark' ),
-                            'woocommerce_before_add_to_cart_form'       => __( 'Before Add to Cart', 'shopspark' ),
-                            'woocommerce_before_variations_form'        => __( 'Before Variations', 'shopspark' ),
-                            'woocommerce_before_add_to_cart_button'     => __( 'Before Add to Cart Button', 'shopspark' ),
-                            'woocommerce_before_single_variation'       => __( 'Before Single Variation', 'shopspark' ),
-                            'woocommerce_single_variation'              => __( 'Single Variation', 'shopspark' ),
-                            'woocommerce_before_add_to_cart_quantity'   => __( 'Before Add to Cart Quantity', 'shopspark' ),
-                            'woocommerce_after_add_to_cart_quantity'    => __( 'After Add to Cart Quantity', 'shopspark' ),
-                            'woocommerce_after_single_variation'        => __( 'After Single Variation', 'shopspark' ),
-                            'woocommerce_after_add_to_cart_button'      => __( 'After Add to Cart Button', 'shopspark' ),
-                            'woocommerce_after_variations_form'         => __( 'After Variations', 'shopspark' ),
-                            'woocommerce_after_add_to_cart_form'        => __( 'After Add to Cart Form', 'shopspark' ),
-                            'woocommerce_product_meta_start'            => __( 'Product Meta Start', 'shopspark' ),
-                            'woocommerce_product_meta_end'              => __( 'Product Meta End', 'shopspark' ),
-                            'woocommerce_share'                         => __( 'Share', 'shopspark' ),
-                            'woocommerce_after_single_product_summary'  => __( 'After Single Product Summary', 'shopspark' ),
-                            'woocommerce_after_single_product'          => __( 'After Single Product', 'shopspark' ),
-                        ),
+                        $this->All_WC_Product_Hooks(),
                         $options['tab_popup_button_hook'] ?? 'woocommerce_after_single_product_summary',
                         'tabPopupHook'
                     );

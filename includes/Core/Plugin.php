@@ -75,6 +75,8 @@ class Plugin {
 
         $providers[] = \ShopSpark\Modules\AjaxAddToCart\AjaxAddToCartServerProvider::class;
 
+        $providers[] = \ShopSpark\Modules\BuyNowButton\BuyNowButtonServiceProvider::class;
+
         /**
          * Allow filtering the enabled modules for future extensibility.
          *
