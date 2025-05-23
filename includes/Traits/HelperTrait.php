@@ -66,11 +66,38 @@ trait HelperTrait
      */
     public function All_WC_Archive_Hooks(): array
     {
-        return array(
+        $hooks = array(
+            'woocommerce_before_main_content'           => __( 'Before Main Content', 'shopspark' ),
+            'woocommerce_archive_description'           => __( 'Archive Description', 'shopspark' ),
+            'woocommerce_before_shop_loop'              => __( 'Before Shop Loop', 'shopspark' ),
+            'woocommerce_no_products_found'             => __( 'No Products Found', 'shopspark' ),
+            'woocommerce_before_shop_loop_item'         => __( 'Before Shop Loop Item', 'shopspark' ),
+            'woocommerce_before_shop_loop_item_title'   => __( 'Before Product Title', 'shopspark' ),
+            'woocommerce_shop_loop_item_title'          => __( 'Product Title', 'shopspark' ),
+            'woocommerce_after_shop_loop_item_title'    => __( 'After Product Title', 'shopspark' ),
+            'woocommerce_after_shop_loop_item'          => __( 'After Shop Loop Item', 'shopspark' ),
+            'woocommerce_after_shop_loop'               => __( 'After Shop Loop', 'shopspark' ),
+            'woocommerce_after_main_content'            => __( 'After Main Content', 'shopspark' ),
+            'woocommerce_sidebar'                       => __( 'Sidebar', 'shopspark' ),
+        );
+
+        return apply_filters( 'shopspark_wc_shop_hooks', $hooks );
+    }
+
+    /**
+     * Get Shop/Archive Page Loop Hooks
+     * 
+     * @return array Hook => Label mappings.
+     */
+    public function All_WC_Archive_Loop_Hooks(){
+        
+        $hooks = array(
             'woocommerce_after_shop_loop_item_title' => __( 'After Product Title', 'shopspark' ),
             'woocommerce_after_shop_loop_item'       => __( 'After Product Item', 'shopspark' ),
             'woocommerce_before_shop_loop_item_title'=> __( 'Before Product Title', 'shopspark' ),
             'woocommerce_before_shop_loop_item'      => __( 'Before Product Item', 'shopspark' ),
         );
+
+        return apply_filters( 'shopspark_wc_shop_hooks', $hooks );
     }
 }

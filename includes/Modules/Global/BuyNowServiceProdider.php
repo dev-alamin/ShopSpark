@@ -1,24 +1,24 @@
 <?php 
-namespace ShopSpark\Modules\BuyNowButton;
+namespace ShopSpark\Modules\Global;
 
 use ShopSpark\Core\ServiceProviderInterface;
 use ShopSpark\TemplateFunctions;
 use ShopSpark\Traits\HelperTrait;
 
 /**
- * Class BuyNowButtonServiceProvider
+ * Class BuyNowServiceProdider
  * 
  * @package ShopSpark
  */
-class BuyNowButtonServiceProvider implements ServiceProviderInterface {
+class BuyNowServiceProdider implements ServiceProviderInterface {
     protected array $settings;
     protected string $settings_field;
 
     use HelperTrait;
 
     public function __construct() {
-        $this->settings = get_option( 'shopspark_product_page_buy_now_button', [] );
-        $this->settings_field = 'shopspark_product_page_buy_now_button';
+        $this->settings = get_option( 'shopspark_global_buy_now', [] );
+        $this->settings_field = 'shopspark_global_buy_now';
     }
 
     /**
@@ -27,10 +27,10 @@ class BuyNowButtonServiceProvider implements ServiceProviderInterface {
      * @return void
      */
     public function register(): void {
-        add_action( 'shopspark_admin_product_page_panel_buy_now_button', array( $this, 'settings' ) );
+        add_action( 'shopspark_admin_global_panel_buy_now', array( $this, 'settings' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueueAssets' ) );
 
-        $button_position_hook = $this->settings['button_position'] ?? 'woocommerce_after_add_to_cart_form';
+        $button_position_hook = $this->settings['button_position'] ?? 'woocommerce_after_shop_loop_item_title';
         
         // Add the button to the product page using hooks
         add_action( $button_position_hook, [ $this, 'render_button' ]);
@@ -42,7 +42,9 @@ class BuyNowButtonServiceProvider implements ServiceProviderInterface {
          * Otherwise, we may get a fatal error
          */
         add_action( 'init', function() {
-            add_shortcode( 'shopspark_buy_now_button', [ $this, 'render_shortcode' ] );
+            if( ! shortcode_exists( 'shopspark_buy_now_button' ) ) {
+                add_shortcode( 'shopspark_buy_now_button', [ $this, 'render_shortcode' ] );
+            }
         });
     }
 
@@ -137,6 +139,7 @@ class BuyNowButtonServiceProvider implements ServiceProviderInterface {
         wp_enqueue_style( 'shopspark-buy-now-button-css', SHOP_SPARK_PLUGIN_ASSETS_URL . 'buy-now-button/buy-now-button.css', array(), SHOP_SPARK_VERSION );
         wp_enqueue_script( 'shopspark-buy-now-button-js', SHOP_SPARK_PLUGIN_ASSETS_URL . 'buy-now-button/buy-now-button.js', array( 'jquery' ), SHOP_SPARK_VERSION, true );
     }
+
     /**
      * Settings
      *
@@ -148,7 +151,7 @@ class BuyNowButtonServiceProvider implements ServiceProviderInterface {
         ?>
         <div class="max-w-5xl mx-auto">
             <h2 class="!text-3xl !font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2">
-                <?php _e( 'Product Page – Variation & Tab Popup Settings', 'shopspark' ); ?>
+                <?php _e( 'Shop Page - Buy Now Button', 'shopspark' ); ?>
             </h2>
 
             <form method="post" action="options.php" class="space-y-6"
@@ -159,7 +162,7 @@ class BuyNowButtonServiceProvider implements ServiceProviderInterface {
                     variationPopupAlign: '<?php echo esc_js( $options['ajax_add_to_cart_alignment'] ?? 'center' ); ?>',
                     fontSize: '<?php echo esc_js( $options['button_font_size'] ?? '16px' ); ?>',
                     buttonStyle: '<?php echo esc_js( $options['button_style'] ?? 'solid' ); ?>',
-                    buttonPosition: '<?php echo esc_js( $options['button_position'] ?? 'woocommerce_after_add_to_cart_form' ); ?>'
+                    buttonPosition: '<?php echo esc_js( $options['button_position'] ?? 'woocommerce_after_shop_loop_item_title' ); ?>'
                 }">
 
                 <?php settings_fields( $this->settings_field ); ?>
@@ -222,8 +225,8 @@ class BuyNowButtonServiceProvider implements ServiceProviderInterface {
                 echo TemplateFunctions::moduleDropdownField(
                     $this->settings_field . '[button_position]',
                     __( 'Button Position', 'shopspark' ),
-                    $this->All_WC_Product_Hooks(),
-                    $options['button_position'] ?? 'woocommerce_after_add_to_cart_form',
+                    $this->All_WC_Archive_Loop_Hooks(),
+                    $options['button_position'] ?? 'woocommerce_after_shop_loop_item_title',
                     'buttonPosition'
                 );
 

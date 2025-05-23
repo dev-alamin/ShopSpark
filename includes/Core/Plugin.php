@@ -77,6 +77,8 @@ class Plugin {
 
         $providers[] = \ShopSpark\Modules\BuyNowButton\BuyNowButtonServiceProvider::class;
 
+        $providers[] = \ShopSpark\Modules\Global\BuyNowServiceProdider::class;
+
         /**
          * Allow filtering the enabled modules for future extensibility.
          *
