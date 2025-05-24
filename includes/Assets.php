@@ -1,7 +1,9 @@
 <?php
 namespace ShopSpark;
 
+use ShopSpark\Traits\HelperTrait;
 class Assets {
+    use HelperTrait;
 
 	protected string $plugin_file;
 
@@ -47,9 +49,12 @@ class Assets {
         wp_register_script( 'shopspark-alpine', SHOP_SPARK_PLUGIN_ASSETS_URL . 'js/alpine.min.js', array(), '3.0.0', true );
 
 		// wp_enqueue_script( 'shopspark-alpine', '//cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', array(), '3.0.0', true );
+		wp_enqueue_script( 'shopspark-admin', SHOP_SPARK_PLUGIN_ASSETS_URL . 'admin/admin.js', array( 'shopspark-alpine' ), '1.0', true );
 
 		// Your own admin JS
-		wp_enqueue_script( 'shopspark-admin-js', plugins_url( 'admin/assets/js/admin.js', $this->plugin_file ), array( 'shopspark-alpine' ), '1.0', true );
+
+        $hook_labels = $this->AllHooksListFlat(); // or your grouped/filtered hooks
+        wp_localize_script( 'shopspark-admin', 'ShopSparkHookLabels', $hook_labels );
 	}
 
     public function enqueue_frontend_assets( string $hook ): void {

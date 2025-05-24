@@ -387,4 +387,73 @@ class TemplateFunctions {
 		include $templatePath;
 		echo ob_get_clean();
 	}
+
+    public static function moduleTextareaRepeaterField( $settings_field, $options = [], $hooks = [] ) {
+        ?>
+        <div x-data="{ items: <?php echo json_encode( $options ); ?> }" class="space-y-6">
+            <template x-for="(item, index) in items" :key="index">
+                <div class="p-4 border rounded bg-white space-y-3">
+                    <label class="block">
+                        <span class="text-gray-700"><?php _e( 'Title (Optional)', 'shopspark' ); ?></span>
+                        <input type="text" :name="'<?php echo esc_attr( $settings_field ); ?>[text_repeater_items][' + index + '][title]'" x-model="item.title" class="form-input mt-1 block w-full" />
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700"><?php _e( 'Text/HTML Content', 'shopspark' ); ?></span>
+                        <textarea :name="'<?php echo esc_attr( $settings_field ); ?>[text_repeater_items][' + index + '][content]'" x-model="item.content" class="form-textarea mt-1 block w-full" rows="4"></textarea>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700"><?php _e( 'Hook Location', 'shopspark' ); ?></span>
+                        <select :name="'<?php echo esc_attr( $settings_field ); ?>[text_repeater_items][' + index + '][hook]'" x-model="item.hook" class="form-select mt-1 block w-full">
+                            <?php foreach ( $hooks as $hook => $label ) : ?>
+                                <option value="<?php echo esc_attr( $hook ); ?>"><?php echo esc_html( $label ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+
+                    <label class="block">
+                        <span class="text-gray-700"><?php _e( 'Priority (default: 10)', 'shopspark' ); ?></span>
+                        <input type="number" :name="'<?php echo esc_attr( $settings_field ); ?>[text_repeater_items][' + index + '][priority]'" x-model="item.priority" class="form-input mt-1 block w-full" />
+                    </label>
+
+                    <button type="button" @click="items.splice(index, 1)" class="text-red-600 text-sm hover:underline">
+                        <?php _e( 'Remove This Item', 'shopspark' ); ?>
+                    </button>
+                </div>
+            </template>
+
+            <button type="button" @click="items.push({ title: '', content: '', hook: '', priority: 10 })"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <?php _e( 'Add New Text Block', 'shopspark' ); ?>
+            </button>
+        </div>
+        <?php
+    }
+
+
+
+    public static function generate_tailwind_spacing_class( string $input, string $type = 'm' ): string {
+        $parts = preg_split('/\s+/', trim($input));
+        $type = rtrim($type, '-');
+
+        // Add px unit if the value is numeric and lacks units
+        $normalize = fn($val) => preg_match('/^\d+$/', $val) ? $val . 'px' : $val;
+
+        $parts = array_map($normalize, $parts);
+
+        switch (count($parts)) {
+            case 1:
+                return "{$type}-[{$parts[0]}]!";
+            case 2:
+                return "{$type}y-[{$parts[0]}] {$type}x-[{$parts[1]}]!";
+            case 3:
+                return "{$type}t-[{$parts[0]}] {$type}x-[{$parts[1]}] {$type}b-[{$parts[2]}]!";
+            case 4:
+                return "{$type}t-[{$parts[0]}] {$type}r-[{$parts[1]}] {$type}b-[{$parts[2]}] {$type}l-[{$parts[3]}]!";
+            default:
+                return '';
+        }
+    }
+
 }

@@ -40,12 +40,13 @@ class Plugin {
         $settings = is_array( $settings ) ? $settings : array();
     
         // Safely read module flags
-        $quickView           = ! empty( $settings['quick_view'] )            && (int) $settings['quick_view']            === 1;
-        $loadMore            = ! empty( $settings['ajax_load_more'] )        && (int) $settings['ajax_load_more']        === 1;
-        $quantityButtons     = ! empty( $settings['quantity_buttons'] )      && (int) $settings['quantity_buttons']      === 1;
-        $enhanceProductTitle = ! empty( $settings['variation_name_title'] )  && (int) $settings['variation_name_title']  === 1;
-        $tabPopup            = ! empty( $settings['product_tabs_popup'] )    && (int) $settings['product_tabs_popup']    === 1;
-        $variationPopup      = ! empty( $settings['variation_popup'] )       && (int) $settings['variation_popup']       === 1;
+        $quickView           = ! empty( $settings['quick_view'] )            && (int) $settings['quick_view']           === 1;
+        $loadMore            = ! empty( $settings['ajax_load_more'] )        && (int) $settings['ajax_load_more']       === 1;
+        $quantityButtons     = ! empty( $settings['quantity_buttons'] )      && (int) $settings['quantity_buttons']     === 1;
+        $enhanceProductTitle = ! empty( $settings['variation_name_title'] )  && (int) $settings['variation_name_title'] === 1;
+        $tabPopup            = ! empty( $settings['product_tabs_popup'] )    && (int) $settings['product_tabs_popup']   === 1;
+        $variationPopup      = ! empty( $settings['variation_popup'] )       && (int) $settings['variation_popup']      === 1;
+        $element_pusher      = ! empty( $settings['element_pusher'] ) && (int) $settings['element_pusher']              === 1;
 
         $providers = array();
     
@@ -78,6 +79,10 @@ class Plugin {
         $providers[] = \ShopSpark\Modules\BuyNowButton\BuyNowButtonServiceProvider::class;
 
         $providers[] = \ShopSpark\Modules\Global\BuyNowServiceProdider::class;
+
+        if( $element_pusher ) {
+            $providers[] = \ShopSpark\Modules\Global\ElementPusherServiceProvider::class;
+        }
 
         /**
          * Allow filtering the enabled modules for future extensibility.

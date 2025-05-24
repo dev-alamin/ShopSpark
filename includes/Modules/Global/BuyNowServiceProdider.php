@@ -80,16 +80,21 @@ class BuyNowServiceProdider implements ServiceProviderInterface {
         $is_variable = $product->is_type('variable');
 
         // Optional: Get custom settings from your plugin options
-        $options    = $this->settings;                                   // Replace with your actual settings field
+        $options    = $this->settings;
         $btn_text   = $options['text'] ?? __('Buy Now', 'shopspark');
         $color      = $options['button_color'] ?? '#3b82f6';
         $text_color = $options['button_color_text_color'] ?? '#ffffff';
         $font_size  = $options['button_font_size'] ?? '16px';
         $position   = $options['button_position'] ?? 'center';
         $style      = $options['button_style'] ?? 'solid';
+        $width      = $options['button_width'] ?? 'inherirt';
+        $height     = $options['button_height'] ?? 'inherit';
+        $alignment  = $options['buy_now_btn_alignment'] ?? 'center';
+        $margin     = $options['button_margin'] ?? '2px';
+        $padding    = $options['button_padding'] ?? '8px';
 
         // Classes based on style
-        $style_class = match($style) {
+        $border_class = match($style) {
             'outline' => 'border border-current bg-transparent text-blue-600',
             'rounded' => 'rounded-full',
             default => 'bg-blue-600 text-white',
@@ -101,12 +106,46 @@ class BuyNowServiceProdider implements ServiceProviderInterface {
             default => 'text-center',
         };
 
+        $width_class = match($width) {
+            'full' => 'w-full',
+            'auto' => 'w-auto',
+            default => (!empty($width) ? "w-[" . trim($width) . "]" : ''),
+        };
+
+        $height_class = match($height) {
+            'full' => 'h-full',
+            'auto' => 'h-auto',
+            default => (!empty($height) ? "h-[" . trim($height) . "]" : ''),
+        };
+
+                // Alignment class
+        $align_class = match($alignment) {
+            'left'   => 'text-left',
+            'right'  => 'text-right',
+            'center' => 'text-center',
+            default  => (!empty($alignment) ? "text-[" . trim($alignment) . "]" : ''),
+        };
+
+        $margin_class = TemplateFunctions::generate_tailwind_spacing_class( $margin, 'm' );
+        $padding_class = TemplateFunctions::generate_tailwind_spacing_class( $padding, 'p' );
+
+        $html_class = [
+            $height_class,
+            $width_class,
+            $border_class,
+            $align_class,
+            $margin_class,
+            $padding_class
+        ];
+
+        $html_class = implode( " ", $html_class );
+
         if ( $is_variable ) {
             // We handle this via JS (because variation must be selected first)
             echo "<div class='$align_class mt-2'>
                 <button 
                     type='button' 
-                    class='shopspark-buy-now-variable px-4 py-2 $style_class'
+                    class='shopspark-buy-now-variable px-4 py-2 $html_class'
                     style='background-color: $color; font-size: $font_size; color: $text_color;' 
                     data-product-id='$product_id'>
                     $btn_text
@@ -122,7 +161,7 @@ class BuyNowServiceProdider implements ServiceProviderInterface {
             echo "<div class='$align_class mt-2'>
                 <a 
                     href='$checkout_url' 
-                    class='shopspark-buy-now-simple px-4 py-2 inline-block $style_class'
+                    class='shopspark-buy-now-simple px-4 py-2 inline-block $html_class'
                     style='background-color: $color; font-size: $font_size; color: $text_color; text-decoration: none;'>
                     $btn_text
                 </a>
@@ -159,7 +198,10 @@ class BuyNowServiceProdider implements ServiceProviderInterface {
                     btnText: '<?php echo esc_js( $options['text'] ?? __( 'Buy Now', 'shopspark' ) ); ?>', 
                     buttonColor: '<?php echo esc_js( $options['button_color'] ?? '#3b82f6' ); ?>',
                     buttonBgColor: '<?php echo esc_js( $options['button_color_text_color'] ?? '#ffffff' ); ?>',
-                    variationPopupAlign: '<?php echo esc_js( $options['ajax_add_to_cart_alignment'] ?? 'center' ); ?>',
+                    ButtonPopupAlign: '<?php echo esc_js( $options['buy_now_btn_alignment'] ?? 'center' ); ?>',
+                    width: '<?php echo esc_js( $options['button_width'] ?? '92px' ); ?>',
+                    padding: '<?php echo esc_js( $options['button_padding'] ?? '12px' ); ?>',
+                    margin: '<?php echo esc_js( $options['button_margin'] ?? '2px' ); ?>',
                     fontSize: '<?php echo esc_js( $options['button_font_size'] ?? '16px' ); ?>',
                     buttonStyle: '<?php echo esc_js( $options['button_style'] ?? 'solid' ); ?>',
                     buttonPosition: '<?php echo esc_js( $options['button_position'] ?? 'woocommerce_after_shop_loop_item_title' ); ?>'
@@ -168,22 +210,16 @@ class BuyNowServiceProdider implements ServiceProviderInterface {
                 <?php settings_fields( $this->settings_field ); ?>
 
                 <?php
-                echo TemplateFunctions::moduleCheckboxField(
-                    $this->settings_field . '[enable_ajax_add_to_cart]',
-                    __( 'Enable Variation Selection as Popup/Sidebar', 'shopspark' ),
-                    $options['enable_ajax_add_to_cart'] ?? false
-                );
-
                 echo TemplateFunctions::moduleDropdownField(
-                    $this->settings_field . '[ajax_add_to_cart_alignment]',
-                    __( 'Popup Alignment', 'shopspark' ),
+                    $this->settings_field . '[buy_now_btn_alignment]',
+                    __( 'Button Allignment', 'shopspark' ),
                     array(
-                        'center' => __( 'Center Modal', 'shopspark' ),
-                        'right'  => __( 'Sidebar Right', 'shopspark' ),
-                        'left'   => __( 'Sidebar Left', 'shopspark' ),
+                        'center' => __( 'Center', 'shopspark' ),
+                        'right'  => __( 'Right', 'shopspark' ),
+                        'left'   => __( 'Left', 'shopspark' ),
                     ),
-                    $options['ajax_add_to_cart_alignment'] ?? 'center',
-                    'variationPopupAlign'
+                    $options['buy_now_btn_alignment'] ?? 'center',
+                    'ButtonPopupAlign'
                 );
 
                 echo TemplateFunctions::moduleInputField(
@@ -208,6 +244,42 @@ class BuyNowServiceProdider implements ServiceProviderInterface {
                     ),
                     $options['button_style'] ?? 'solid',
                     'buttonStyle'
+                );
+
+                echo TemplateFunctions::moduleInputField(
+                    $this->settings_field . '[button_width]',
+                    __( 'Button Width (e.g., 92px or 1rem)', 'shopspark' ),
+                    'width',
+                    '92px',
+                    '!important',
+                    '',
+                    '',
+                    '',
+                    true
+                );
+
+                echo TemplateFunctions::moduleInputField(
+                    $this->settings_field . '[button_padding]',
+                    __( 'Button Padding (e.g., 10px or 1rem)', 'shopspark' ),
+                    'padding',
+                    '10px',
+                    '!important',
+                    '',
+                    '',
+                    '',
+                    true
+                );
+
+                 echo TemplateFunctions::moduleInputField(
+                    $this->settings_field . '[button_margin]',
+                    __( 'Button Margin (e.g., 5px - Sequence top-right-bottom-left)', 'shopspark' ),
+                    'margin',
+                    '2px',
+                    '!important',
+                    '',
+                    '',
+                    '',
+                    true
                 );
 
                 echo TemplateFunctions::moduleInputField(

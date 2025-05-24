@@ -100,4 +100,15 @@ trait HelperTrait
 
         return apply_filters( 'shopspark_wc_shop_hooks', $hooks );
     }
+
+    public function AllHooksListFlat() {
+        return [
+            'wp_head' => 'WordPress Head',
+            'wp_footer' => 'WordPress Footer',
+            ...$this->All_WC_Archive_Hooks(),
+            ...$this->All_WC_Product_Hooks(),
+            // add more as needed
+        ];
+    }
+
 }
