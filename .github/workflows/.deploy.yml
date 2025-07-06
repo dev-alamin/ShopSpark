@@ -22,3 +22,11 @@ jobs:
           port: 22
           source: "."
           target: "/var/www/shaliktheme/wp-content/plugins/shopSpark"
+          exclude: |
+                .git
+                .github
+                README.md
+                composer.json
+                composer.lock
+                tests
+                docs
