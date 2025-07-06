@@ -7,3 +7,5 @@ The ShopSpark plugin is designed to enhance the functionality of WordPress sites
 1. Faced challenges on pagination in shop page
 2. Challenges for popup for product data tab, making it dynamic keeping filter default behavior
 3. Tailwind conflict with existing css
+
+### Some changes
