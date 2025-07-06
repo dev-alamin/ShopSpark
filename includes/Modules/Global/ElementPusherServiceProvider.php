@@ -84,7 +84,7 @@ class ElementPusherServiceProvider implements ServiceProviderInterface{
         ?>
         <div class="max-w-5xl mx-auto">
             <h2 class="!text-3xl !font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2">
-                <?php _e( 'Text Repeater – Inject Text Snippets Anywhere', 'shopspark' ); ?>
+                <?php _e( 'Element Pusher Repeater Options', 'shopspark' ); ?>
             </h2>
 
         <form method="post" action="options.php"
@@ -217,7 +217,7 @@ class ElementPusherServiceProvider implements ServiceProviderInterface{
 
             <button type="button" @click="items.push({ title: '', content: '', hook: '', priority: 10, open: true })"
                 class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mt-4">
-                <?php _e( 'Add New Text Block', 'shopspark' ); ?>
+                <?php _e( 'Add New Block', 'shopspark' ); ?>
             </button>
 
             <div class="mt-6">
