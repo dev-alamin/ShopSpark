@@ -36,3 +36,9 @@ button.quantity-btn.increase:focus{
 .shopspark-quick-view-btn {
     padding: 5px 10px;
 }
+
+.shopspark-quick-view-btn svg {
+    width: 100%;
+    height: 100%;
+    display: block; /* remove inline spacing */
+}

@@ -8,27 +8,29 @@ document.addEventListener('DOMContentLoaded', function () {
     // Use event delegation to handle clicks on dynamically added buttons
     // Use event delegation to handle clicks on dynamically added buttons
     document.body.addEventListener('click', function (e) {
-        if (e.target.classList.contains('shopspark-quick-view-btn')) {
+        const btn = e.target.closest('.shopspark-quick-view-btn');
+
+        if (btn) {
+
             e.preventDefault();
-            const productId = e.target.getAttribute('data-product-id');
+            const productId = btn.getAttribute('data-product-id');
             
             // Show the modal
-            modal.classList.remove('hidden');
+            modal.classList.remove('shopspark-hidden');
 
-            
             modalContent.innerHTML = `
-            <div class="text-center text-gray-700">
-                <svg class="animate-spin h-6 w-6 mx-auto text-purple-600 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10"
-                        stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z">
-                    </path>
-                </svg>
-                Loading product...
-            </div>
-        `;
+                <div class="text-center shopspark-text-gray-700">
+                    <svg class="shopspark-animate-spin shopspark-h-6 shopspark-w-6 shopspark-mx-auto shopspark-text-purple-600 shopspark-mb-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="shopspark-opacity-25" cx="12" cy="12" r="10"
+                            stroke="currentColor" stroke-width="4"></circle>
+                        <path class="shopspark-opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z">
+                        </path>
+                    </svg>
+                    Loading product...
+                </div>
+            `;
 
         fetch(shopspark_ajax.ajax_url + '?action=shopspark_quick_view&product_id=' + productId)
         .then(res => res.text())
@@ -41,24 +43,20 @@ document.addEventListener('DOMContentLoaded', function () {
             // Initialize the variation form
             initVariationForm();
         });
-    
 
-
-            
-            // TODO: Fetch and insert actual product data using AJAX
         }
     });
 
     // Close modal
     closeBtn.addEventListener('click', function () {
-        modal.classList.add('hidden');
+        modal.classList.add('shopspark-hidden');
         modalContent.innerHTML = '';
     });
 
     // Close on backdrop click
     modal.addEventListener('click', function (e) {
         if (e.target === modal) {
-            modal.classList.add('hidden');
+            modal.classList.add('shopspark-hidden');
             modalContent.innerHTML = '';
         }
     });
@@ -108,7 +106,7 @@ function initQuickViewGallery() {
             if (!addToCartButton || addToCartButton.disabled) return;
 
             addToCartButton.disabled = true;
-            addToCartButton.classList.add('opacity-50', 'pointer-events-none');
+            addToCartButton.classList.add('shopspark-opacity-50', 'pointer-events-none');
 
             const originalButtonHTML = addToCartButton.innerHTML;
 
@@ -126,7 +124,7 @@ function initQuickViewGallery() {
                 if (data.success) {
                     addToCartButton.innerHTML = `
                         <span>${data.data.added_message}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="shopspark-h-5 shopspark-w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
                     `;
@@ -174,7 +172,6 @@ function initQuickViewGallery() {
     });
 }
 
-
 function showShopSparkToast(message, type = 'success', isCartCountMessage = false) {
     const container = document.getElementById('shopspark-toast-container');
 
@@ -183,13 +180,15 @@ function showShopSparkToast(message, type = 'success', isCartCountMessage = fals
     // Create the toast element
     const toast = document.createElement('div');
     toast.className = `
-        toast-message flex items-center max-w-xs w-full p-4 text-gray-900 bg-white rounded-lg shadow-lg
-        ${type === 'success' ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500'}
-        animate-fade-in-up
+        toast-message shopspark-flex shopspark-items-center shopspark-max-w-xs shopspark-w-full shopspark-p-4 
+        shopspark-text-gray-900 shopspark-bg-white shopspark-rounded-lg shopspark-shadow-lg
+        ${type === 'success' ? 'shopspark-border-l-4 shopspark-border-green-500' : 'shopspark-border-l-4 shopspark-border-red-500'}
+        shopspark-animate-fade-in-up
         ${isCartCountMessage ? 'cart-count-toast' : 'add-to-cart-toast'}
     `;
+
     toast.innerHTML = `
-        <div class="text-sm font-medium">${message}</div>
+        <div class="shopspark-text-sm shopspark-font-medium">${message}</div>
     `;
 
     // === NEW FIX: Always remove previous same type toast ===
@@ -219,12 +218,13 @@ function showShopSparkToast(message, type = 'success', isCartCountMessage = fals
 
     // === Auto remove after 3s ===
     setTimeout(() => {
-        toast.classList.add('opacity-0', 'transition', 'duration-500');
+        toast.classList.add('shopspark-opacity-0', 'shopspark-transition', 'shopspark-duration-500');
         setTimeout(() => {
             toast.remove();
         }, 500);
     }, 3000);
 }
+
 
 function adjustQuantity(action, productId) {
     var quantityInput = document.getElementById('quantity_' + productId); 

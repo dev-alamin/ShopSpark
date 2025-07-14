@@ -6,7 +6,8 @@
     "autoload": {
       "psr-4": {
         "ShopSpark\\": "includes/"
-      }
+      },
+    "files": [ "includes/functions.php" ]
     },
     "authors": [
       {
