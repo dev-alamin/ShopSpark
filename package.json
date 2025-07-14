@@ -4,7 +4,8 @@
   "description": "**ShopSpark** is a powerful WordPress plugin designed to enhance the user experience for WooCommerce shoppers. Packed with thoughtful, conversion-focused features, ShopSpark makes your store smarter, faster, and more interactive — without writing a single line of code.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tw": "npx tailwindcss -i ./assets/css/input.css -o ./assets/dist/output.css --watch"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-<div x-data="{ openTab: null }" class="shopspark-relative shopspark-z-[99999]">
+<div x-data="{ openTab: null }" class="shopspark-relative shopspark-z-[999]">
     <!-- Trigger Buttons -->
     <div class="shopspark-space shopspark-mb-4">
         <?php foreach ( $tabs as $key => $tab ) : ?>

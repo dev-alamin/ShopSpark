@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const li = document.createElement('li');
                 li.textContent = option.text;
                 li.dataset.value = option.value;
-                li.className = 'shopspark-option-item shopspark-cursor-pointer shopspark-w-full shopspark-bg-gray-100 shopspark-hover:bg-blue-500 shopspark-hover:text-white shopspark-px-4 shopspark-py-2 shopspark-rounded shopspark-transition shopspark-duration-200 shopspark-ease-in-out shopspark-text-sm shopspark-list-none';
+                li.className = 'shopspark-option-item shopspark-cursor-pointer shopspark-w-full shopspark-bg-gray-100 hover:shopspark-bg-blue-500 hover:shopspark-text-white shopspark-px-4 shopspark-py-2 shopspark-rounded shopspark-transition shopspark-duration-200 shopspark-ease-in-out shopspark-text-sm shopspark-list-none';
                 variationList.appendChild(li);
             });
 

@@ -65,9 +65,16 @@ class VariationPopupServerProvider implements ServiceProviderInterface
             id="shopspark-variation-container"
             class="<?php echo esc_attr("$base_classes $position_classes"); ?>"
         >
-            <p class="shopspark-text-lg shopspark-font-semibold shopspark-text-gray-700">
-                <?php esc_html_e( 'Please select an option:', 'shopspark' ); ?>
-            </p>
+            <div class="shopspark-flex shopspark-items-center shopspark-justify-between">
+                <p class="shopspark-text-lg shopspark-font-semibold shopspark-text-gray-700">
+                    <?php esc_html_e( 'Please select an option:', 'shopspark' ); ?>
+                </p>
+                <button 
+                    type="button"
+                    class="shopspark-text-gray-500 hover:shopspark-text-red-600 shopspark-text-xl shopspark-font-bold shopspark-leading-none shopspark-rounded-full"
+                    @click="openTab = null"
+                >✕</button>
+            </div>
 
             <ul class="shopspark-variation-list shopspark-space-y-2 !shopspark-ml-[0px]">
                 <!-- Options will be injected here -->
@@ -77,6 +84,7 @@ class VariationPopupServerProvider implements ServiceProviderInterface
                 <?php esc_html_e( 'Close', 'shopspark' ); ?>
             </button>
         </div>
+
         <?php 
     }
 
