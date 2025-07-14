@@ -41,24 +41,26 @@ class BuyNowButtonServiceProvider implements ServiceProviderInterface {
      *
      * @return void
      */
-    function render_button() {
+    public function render_button() {
         global $product;
 
-        // Only show for simple and variable products
-        if ( ! $product->is_purchasable() || ! $product->is_in_stock() ) return;
+        // Only show for purchasable and in-stock products
+        if ( ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+            return;
+        }
 
         $product_id = $product->get_id();
         $is_variable = $product->is_type('variable');
 
-        // Optional: Get custom settings from your plugin options
-        $options    = $this->settings;                                   // Replace with your actual settings field
+        // Plugin options (replace with your actual settings)
+        $options    = $this->settings;
         $btn_text   = $options['text'] ?? __('Buy Now', 'shopspark');
         $color      = $options['button_color'] ?? '#3b82f6';
         $text_color = $options['button_color_text_color'] ?? '#ffffff';
         $font_size  = $options['button_font_size'] ?? '16px';
         $position   = $options['button_position'] ?? 'center';
         $style      = $options['button_style'] ?? 'solid';
-        $width      = $options['button_width'] ?? 'inherirt';
+        $width      = $options['button_width'] ?? 'inherit';
         $height     = $options['button_height'] ?? 'inherit';
         $alignment  = $options['buy_now_btn_alignment'] ?? 'center';
         $margin     = $options['button_margin'] ?? '2px';
@@ -66,76 +68,73 @@ class BuyNowButtonServiceProvider implements ServiceProviderInterface {
 
         // Classes based on style
         $border_class = match($style) {
-            'outline' => 'border border-current bg-transparent text-blue-600',
-            'rounded' => 'rounded-full',
-            default => 'bg-blue-600 text-white',
+            'outline' => 'shopspark-border shopspark-border-current shopspark-bg-transparent shopspark-text-blue-600',
+            'rounded' => 'shopspark-rounded-full',
+            default => 'shopspark-bg-blue-600 shopspark-text-white',
         };
 
-        $align_class = match($position) {
-            'left' => 'text-left',
-            'right' => 'text-right',
-            default => 'text-center',
+        $position_class = match($position) {
+            'left' => 'shopspark-text-left',
+            'right' => 'shopspark-text-right',
+            default => 'shopspark-text-center',
         };
 
         $width_class = match($width) {
-            'full' => 'w-full',
-            'auto' => 'w-auto',
-            default => (!empty($width) ? "w-[" . trim($width) . "]" : ''),
+            'full' => 'shopspark-w-full',
+            'auto' => 'shopspark-w-auto',
+            default => (!empty($width) ? "shopspark-w-[" . trim($width) . "]" : ''),
         };
 
         $height_class = match($height) {
-            'full' => 'h-full',
-            'auto' => 'h-auto',
-            default => (!empty($height) ? "h-[" . trim($height) . "]" : ''),
+            'full' => 'shopspark-h-full',
+            'auto' => 'shopspark-h-auto',
+            default => (!empty($height) ? "shopspark-h-[" . trim($height) . "]" : ''),
         };
 
-                // Alignment class
+        // Alignment class
         $align_class = match($alignment) {
-            'left'   => 'text-left',
-            'right'  => 'text-right',
-            'center' => 'text-center',
-            default  => (!empty($alignment) ? "text-[" . trim($alignment) . "]" : ''),
+            'left'   => 'shopspark-text-left',
+            'right'  => 'shopspark-text-right',
+            'center' => 'shopspark-text-center',
+            default  => (!empty($alignment) ? "shopspark-text-[" . trim($alignment) . "]" : ''),
         };
 
-        $margin_class = TemplateFunctions::generate_tailwind_spacing_class( $margin, 'm' );
-        $padding_class = TemplateFunctions::generate_tailwind_spacing_class( $padding, 'p' );
+        $margin_class = TemplateFunctions::generate_tailwind_spacing_class( $margin, 'shopspark-m' );
+        $padding_class = TemplateFunctions::generate_tailwind_spacing_class( $padding, 'shopspark-p' );
 
-        $html_class = [
+        $html_class = implode( " ", array_filter([
             $height_class,
             $width_class,
             $border_class,
             $align_class,
             $margin_class,
             $padding_class
-        ];
-
-        $html_class = implode( " ", $html_class );
-
+        ]));
 
         if ( $is_variable ) {
-            // We handle this via JS (because variation must be selected first)
-            echo "<div class='$align_class mt-2'>
+            // Button triggers JS for variable product selection
+            echo "<div class='{$position_class} shopspark-mt-2'>
                 <button 
                     type='button' 
-                    class='shopspark-buy-now-variable px-4 py-2 $html_class'
-                    style='background-color: $color; font-size: $font_size; color: $text_color;' 
-                    data-product-id='$product_id'>
-                    $btn_text
+                    class='shopspark-buy-now-variable shopspark-px-4 shopspark-py-2 {$html_class}'
+                    style='background-color: " . esc_attr($color) . "; font-size: " . esc_attr($font_size) . "; color: " . esc_attr($text_color) . ";' 
+                    data-product-id='" . esc_attr($product_id) . "'>
+                    " . esc_html($btn_text) . "
                 </button>
             </div>";
         } else {
-            // For simple products, we can directly send to checkout
+            // For simple products, direct checkout link
             $checkout_url = esc_url( add_query_arg( array(
                 'add-to-cart' => $product_id,
-                'quantity'    => 1
+                'quantity'    => 1,
             ), wc_get_checkout_url() ) );
 
-            echo "<div class='$align_class mt-2'>
+            echo "<div class='{$position_class} shopspark-mt-2'>
                 <a 
-                    href='$checkout_url' 
-                    class='shopspark-buy-now-simple px-4 py-2 inline-block $html_class'
-                    style='background-color: $color; font-size: $font_size; color: $text_color; text-decoration: none;'>
-                    $btn_text
+                    href='{$checkout_url}' 
+                    class='shopspark-buy-now-simple shopspark-px-4 shopspark-py-2 shopspark-inline-block {$html_class}'
+                    style='background-color: " . esc_attr($color) . "; font-size: " . esc_attr($font_size) . "; color: " . esc_attr($text_color) . "; text-decoration: none;'>
+                    " . esc_html($btn_text) . "
                 </a>
             </div>";
         }
@@ -149,7 +148,9 @@ class BuyNowButtonServiceProvider implements ServiceProviderInterface {
     public function enqueueAssets(): void {
         wp_enqueue_style( 'shopspark-buy-now-button-css', SHOP_SPARK_PLUGIN_ASSETS_URL . 'buy-now-button/buy-now-button.css', array(), SHOP_SPARK_VERSION );
         wp_enqueue_script( 'shopspark-buy-now-button-js', SHOP_SPARK_PLUGIN_ASSETS_URL . 'buy-now-button/buy-now-button.js', array( 'jquery' ), SHOP_SPARK_VERSION, true );
+        wp_enqueue_style( 'shopspark-frontend-tailwind' );
     }
+
     /**
      * Settings
      *

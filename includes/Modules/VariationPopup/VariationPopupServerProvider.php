@@ -41,23 +41,23 @@ class VariationPopupServerProvider implements ServiceProviderInterface
      *
      * @return void
      */
-    public function renderVariationPopup(): void
+   public function renderVariationPopup(): void
     {
         $options = $this->settings ?? [];
         $position = $options['variation_popup_alignment'] ?? 'center';
 
-        $base_classes = 'shopspark-variation-wrapper fixed bg-white shadow-xl z-99999 p-6 overflow-y-auto space-y-4 hidden';
+        $base_classes = 'shopspark-variation-wrapper shopspark-fixed shopspark-bg-white shopspark-shadow-xl shopspark-z-[99999] shopspark-p-6 shopspark-overflow-y-auto shopspark-space-y-4 shopspark-hidden';
 
         switch ($position) {
             case 'left':
-                $position_classes = 'left-0 top-0 h-full w-full sm:w-96 rounded-r-2xl';
+                $position_classes = 'shopspark-left-0 shopspark-top-0 shopspark-h-full shopspark-w-full sm:shopspark-w-96 shopspark-rounded-r-2xl';
                 break;
             case 'right':
-                $position_classes = 'right-0 top-0 h-full w-full sm:w-96 rounded-l-2xl';
+                $position_classes = 'shopspark-right-0 shopspark-top-0 shopspark-h-full shopspark-w-full sm:shopspark-w-96 shopspark-rounded-l-2xl';
                 break;
             case 'center':
             default:
-                $position_classes = 'left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-11/12 sm:w-[500px] rounded-2xl';
+                $position_classes = 'shopspark-left-1/2 shopspark-top-1/2 shopspark-transform shopspark--translate-x-1/2 shopspark--translate-y-1/2 shopspark-w-11/12 sm:shopspark-w-[500px] shopspark-rounded-2xl';
                 break;
         }
         ?>
@@ -65,20 +65,21 @@ class VariationPopupServerProvider implements ServiceProviderInterface
             id="shopspark-variation-container"
             class="<?php echo esc_attr("$base_classes $position_classes"); ?>"
         >
-            <p class="text-lg font-semibold text-gray-700">
+            <p class="shopspark-text-lg shopspark-font-semibold shopspark-text-gray-700">
                 <?php esc_html_e( 'Please select an option:', 'shopspark' ); ?>
             </p>
 
-            <ul class="shopspark-variation-list space-y-2 !ml-[0px]">
+            <ul class="shopspark-variation-list shopspark-space-y-2 !shopspark-ml-[0px]">
                 <!-- Options will be injected here -->
             </ul>
 
-            <button class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition">
+            <button class="shopspark-mt-4 shopspark-w-full shopspark-bg-red-500 hover:shopspark-bg-red-600 shopspark-text-white shopspark-font-medium shopspark-py-2 shopspark-px-4 shopspark-rounded shopspark-transition">
                 <?php esc_html_e( 'Close', 'shopspark' ); ?>
             </button>
         </div>
         <?php 
     }
+
 
 
     /**
@@ -92,6 +93,8 @@ class VariationPopupServerProvider implements ServiceProviderInterface
         $buttonColor = $options['button_color'] ?? '#3b82f6';
         
         wp_enqueue_script( 'shopspark-alpine' );
+
+        wp_enqueue_style( 'shopspark-frontend-tailwind' );
 
         wp_enqueue_style( 'shopspark-variation-popup-css', SHOP_SPARK_PLUGIN_ASSETS_URL . 'variation-popup/variation-popup.css', array(), SHOP_SPARK_VERSION );
         wp_enqueue_script( 'shopspark-variation-popup-js', SHOP_SPARK_PLUGIN_ASSETS_URL . 'variation-popup/variation-popup.js', array( 'jquery', 'shopspark-alpine' ), SHOP_SPARK_VERSION, true );

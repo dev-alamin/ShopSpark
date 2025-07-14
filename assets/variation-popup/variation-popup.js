@@ -39,16 +39,17 @@ document.addEventListener('DOMContentLoaded', function () {
             variationList.innerHTML = '';
 
             Array.from(this.options).forEach(option => {
-                if (!option.value) return;
+                if (option.value === '') return; // Only skip empty string
 
                 const li = document.createElement('li');
                 li.textContent = option.text;
                 li.dataset.value = option.value;
-                li.className = 'shopspark-option-item cursor-pointer bg-gray-100 hover:bg-blue-500 hover:text-white px-4 py-2 rounded transition duration-200 ease-in-out text-sm list-none';
+                li.className = 'shopspark-option-item shopspark-cursor-pointer shopspark-w-full shopspark-bg-gray-100 shopspark-hover:bg-blue-500 shopspark-hover:text-white shopspark-px-4 shopspark-py-2 shopspark-rounded shopspark-transition shopspark-duration-200 shopspark-ease-in-out shopspark-text-sm shopspark-list-none';
                 variationList.appendChild(li);
             });
 
-            variationContainer.classList.remove('hidden');
+
+            variationContainer.classList.remove('shopspark-hidden');
             justOpened = true;
             setTimeout(() => (justOpened = false), 100);
         });
@@ -77,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function closePopup() {
-        variationContainer.classList.add('hidden');
+        variationContainer.classList.add('shopspark-hidden');
         if (overlay) overlay.remove();
         overlay = null;
         activeSelect = null;
