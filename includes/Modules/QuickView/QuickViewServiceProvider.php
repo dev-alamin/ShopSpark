@@ -62,10 +62,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 		);
 
 		// Tailwind CDN
-		wp_enqueue_style( 'shopspark-tailwind', '//cdn.jsdelivr.net/npm/@tailwindcss/browser@4', array(), '3.4.1' );
-
-		// Tailwind JS
-		wp_enqueue_script( 'shopspark-tailwindjs', '//cdn.jsdelivr.net/npm/@tailwindcss/browser@4' );
+		wp_enqueue_style( 'shopspark-frontend-tailwind' );
 
 		wp_enqueue_style( 'swiper', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css' );
 
@@ -103,7 +100,7 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 			'<div class="%s">
             <button
                 title="%s"
-                class="shopspark-quick-view-btn px-3 py-1.5 text-sm rounded-lg top-0 right-0" 
+                class="shopspark-quick-view-btn shopspark-px-8 py-1.5 text-sm rounded-lg top-0 right-0" 
                 style="background-color: %s; color: #fff;" 
                 data-product-id="%d">
                 %s
@@ -115,10 +112,14 @@ class QuickViewServiceProvider implements ServiceProviderInterface {
 			esc_attr( $product_id ),
 			esc_html( $text )
 		);
+
+        echo '<h1 class="shopspark-text-center shopspark-text-3xl shopspark-font-extrabold shopspark-text-gray-800 shopspark-bg-gradient-to-r shopspark-from-yellow-200 shopspark-to-yellow-400 shopspark-inline-block shopspark-px-8 shopspark-py-4 shopspark-rounded-xl">Hello world</h1>';
+
 	}
 
 	public function render_quick_view_modal(): void {
-		?>
+        ?>
+        
 		<div id="shopspark-quick-view-modal" class="tailwind-wrapper fixed inset-0 bg-black/50 z-999999 hidden flex items-center justify-center">
 
 		<div id="shopspark-toast-container" class="fixed top-5 right-5 space-y-3 z-50"></div>

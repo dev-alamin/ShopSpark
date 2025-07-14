@@ -1,0 +1,25 @@
+{
+  "name": "shopspark",
+  "version": "1.0.0",
+  "description": "**ShopSpark** is a powerful WordPress plugin designed to enhance the user experience for WooCommerce shoppers. Packed with thoughtful, conversion-focused features, ShopSpark makes your store smarter, faster, and more interactive — without writing a single line of code.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-alamin/ShopSpark.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dev-alamin/ShopSpark/issues"
+  },
+  "homepage": "https://github.com/dev-alamin/ShopSpark#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.3"
+  }
+}

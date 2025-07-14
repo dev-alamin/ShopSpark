@@ -39,11 +39,13 @@ class Assets {
 			return;
 		}
 
-		// Tailwind CDN
-		wp_enqueue_style( 'shopspark-tailwind', '//cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css', array(), '3.4.1' );
+        wp_register_style( 'shopspark-tailwind-css',  SHOP_SPARK_PLUGIN_ASSETS_URL . 'css/tailwind.min.css', array(), '3.4.1' );
+        wp_enqueue_style( 'shopspark-tailwind-css' );
 
-		// Tailwind JS
-		wp_enqueue_script( 'shopspark-tailwindjs', '//cdn.jsdelivr.net/npm/@tailwindcss/browser@4' );
+		// Tailwind CDN
+		wp_register_script( 'shopspark-tailwind', SHOP_SPARK_PLUGIN_ASSETS_URL . 'js/tailwind-minimal.js', array(), '5.39.0' );
+        wp_enqueue_script( 'shopspark-tailwind' ); // Enqueue it
+
 
 		// Alpine JS CDN
         wp_register_script( 'shopspark-alpine', SHOP_SPARK_PLUGIN_ASSETS_URL . 'js/alpine.min.js', array(), '3.0.0', true );
@@ -59,6 +61,9 @@ class Assets {
 
     public function enqueue_frontend_assets( string $hook ): void {
         // Enqueue your frontend assets here
+        // Tailwind CDN
+		wp_register_style( 'shopspark-frontend-tailwind', SHOP_SPARK_PLUGIN_ASSETS_URL . 'dist/output.css', array(), time(), 'all' );
+
         wp_enqueue_style( 'shopspark-frontend-css', plugins_url( 'assets/css/frontend.css', $this->plugin_file ), array(), '1.0.0' );
         wp_enqueue_script( 'shopspark-frontend-js', plugins_url( 'assets/js/frontend.js', $this->plugin_file ), array( 'jquery' ), '1.0.0', true );
 
